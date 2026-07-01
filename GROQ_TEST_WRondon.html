@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groq API Test — W Rondon Construction LLC</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1D3557;--navy-dark:#12253d;--navy-light:#2a4a73;
+  --green:#1e8449;--green-light:#eafaf1;
+  --red:#C0392B;--red-light:#fadbd8;
+  --gray-100:#f1f3f5;--gray-200:#e9ecef;--gray-500:#6c757d;--gray-700:#495057;--gray-900:#212529;
+  --white:#ffffff;
+  --radius:12px;--radius-sm:8px;
+  --shadow-md:0 4px 12px rgba(0,0,0,.10);
+}
+body{font-family:'Inter',sans-serif;background:var(--gray-100);color:var(--gray-900);min-height:100vh;}
+header{background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,var(--navy-light) 100%);color:white;padding:32px 48px;}
+.header-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px;}
+.header-title{font-size:22px;font-weight:800;margin-bottom:4px;}
+.header-sub{font-size:14px;color:rgba(255,255,255,.65);}
+main{max-width:720px;margin:40px auto;padding:0 24px 80px;}
+.card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-md);margin-bottom:20px;}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--gray-200);}
+label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gray-500);display:block;margin-bottom:6px;}
+input, textarea, select{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--gray-900);outline:none;transition:border .15s;}
+input:focus, textarea:focus, select:focus{border-color:var(--navy);}
+textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.btn{padding:10px 24px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-primary{background:var(--navy);color:white;}
+.btn-primary:hover{background:var(--navy-dark);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.status{margin-top:16px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;display:none;}
+.status.success{background:var(--green-light);border:1px solid var(--green);color:var(--green);}
+.status.error{background:var(--red-light);border:1px solid var(--red);color:var(--red);}
+.status.loading{background:#eff6ff;border:1px solid #3b82f6;color:#1d4ed8;}
+.response-box{background:var(--gray-100);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--gray-700);white-space:pre-wrap;word-break:break-word;min-height:80px;margin-top:16px;display:none;}
+.meta-row{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;}
+.meta-item{font-size:11px;color:var(--gray-500);}
+.meta-item span{font-weight:700;color:var(--gray-700);font-family:'JetBrains Mono',monospace;}
+.tag{display:inline-flex;align-items:center;gap:5px;background:rgba(29,53,87,.1);border:1px solid rgba(29,53,87,.2);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--navy);letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;}
+.info-note{font-size:12px;color:var(--gray-500);line-height:1.6;margin-top:8px;padding:10px 14px;background:var(--gray-100);border-radius:var(--radius-sm);border-left:3px solid var(--navy);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">W Rondon Construction LLC · Case No. G-100-25134-975276</div>
+  <div class="header-title">Groq API Connection Test</div>
+  <div class="header-sub">AI Predictive Risk Simulator — Pre-deployment validation · Omar Alfredo Szulak</div>
+</header>
+
+<main>
+
+  <div class="card">
+    <div class="card-title">Step 1 — API Configuration</div>
+    <div class="tag">Groq · openai/gpt-oss-120b</div>
+    <div class="field">
+      <label>Groq API Key</label>
+      <input type="password" id="apiKey" placeholder="gsk_..." value="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">
+      <div class="info-note">La key se usa solo localmente en tu browser. No se envía a ningún servidor excepto a api.groq.com.</div>
+    </div>
+    <div class="field">
+      <label>Model</label>
+      <select id="model">
+        <option value="openai/gpt-oss-120b" selected>openai/gpt-oss-120b (primary)</option>
+        <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b (fallback)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Step 2 — Test Message (Construction Evidence Extraction)</div>
+    <div class="field">
+      <label>Simulated Operational Message</label>
+      <textarea id="testMessage">Supervisor Mark Devlin — Call Note: Framing crew has a one-person reduction starting today. The subcontractor expects to rehire within 3 days. Package P22 Framing Labor is currently in progress.</textarea>
+    </div>
+    <div class="field">
+      <label>Test Type</label>
+      <select id="testType">
+        <option value="extract" selected>Evidence Extraction (extractEvidence)</option>
+        <option value="simulate">Counterpart Response Simulation (simulateResponse)</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="runTest" onclick="runGroqTest()">Run Groq Test</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Step 3 — Groq Response</div>
+    <div id="responseBox" class="response-box"></div>
+    <div class="meta-row" id="metaRow" style="display:none;">
+      <div class="meta-item">Model: <span id="metaModel">—</span></div>
+      <div class="meta-item">Latency: <span id="metaLatency">—</span></div>
+      <div class="meta-item">Tokens used: <span id="metaTokens">—</span></div>
+      <div class="meta-item">Status: <span id="metaStatus">—</span></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+async function runGroqTest() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const model = document.getElementById('model').value;
+  const message = document.getElementById('testMessage').value.trim();
+  const testType = document.getElementById('testType').value;
+  const btn = document.getElementById('runTest');
+  const statusEl = document.getElementById('status');
+  const responseBox = document.getElementById('responseBox');
+  const metaRow = document.getElementById('metaRow');
+
+  if (!apiKey || !apiKey.startsWith('gsk_')) {
+    showStatus('error', 'API key inválida. Debe comenzar con gsk_');
+    return;
+  }
+  if (!message) {
+    showStatus('error', 'El mensaje de prueba no puede estar vacío.');
+    return;
+  }
+
+  btn.disabled = true;
+  showStatus('loading', 'Conectando con Groq API...');
+  responseBox.style.display = 'none';
+  metaRow.style.display = 'none';
+
+  const startTime = Date.now();
+
+  let systemPrompt, userPrompt;
+
+  if (testType === 'extract') {
+    systemPrompt = `You are an evidence extraction assistant for a construction project management system. 
+Your task: read an operational message and extract structured evidence in JSON format.
+IMPORTANT: Return ONLY valid JSON. No markdown, no explanation, no preamble.
+Use only these condition_codes: reduced_crew_capacity, crew_unavailable, recovery_plan_reported, delivery_confirmation_pending, partial_delivery, delivery_delay_confirmed, work_complete, substantially_complete, in_progress, window_conflict_reported.
+Package IDs available: P01-P31 (31 packages total). P22 = Framing Labor.
+Evidence strength: low, medium, high.`;
+
+    userPrompt = `Extract structured evidence from this operational message:
+
+"${message}"
+
+Return this exact JSON structure:
+{
+  "schema_version": "1.0",
+  "actor_role": "supervisor|subcontractor|vendor|project_manager",
+  "channel": "sms|email|call_note|constructiononline",
+  "affected_package_ids": ["P22"],
+  "condition_code": "one of the allowed codes",
+  "condition_status": "reported|pending_confirmation|confirmed|partial|uncertain",
+  "temporal_signal": "none|possible_extension|delay_indicated|recovery_indicated|unknown",
+  "evidence_strength": "low|medium|high",
+  "ambiguities": [],
+  "recommended_translation_rule_id": "RULE_LABOR_REDUCED_CAPACITY_V1",
+  "requires_human_review": true,
+  "model_limitations": ["No actual company fact asserted"]
+}`;
+  } else {
+    systemPrompt = `You are simulating a hypothetical response from a construction subcontractor or vendor. 
+Generate a realistic but clearly hypothetical response.
+IMPORTANT: Return ONLY valid JSON. No markdown, no preamble.
+Label all content as prospective hypothetical demonstration content.`;
+
+    userPrompt = `Generate a hypothetical subcontractor response to this outgoing message:
+
+"${message}"
+
+Return this JSON:
+{
+  "simulated_reply_text": "the hypothetical response",
+  "actor_role": "subcontractor|vendor|supervisor",
+  "message_channel": "sms|email|call_note",
+  "content_provenance": "AI-generated hypothetical demonstration content - subject to review"
+}`;
+  }
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 600,
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    const latency = Date.now() - startTime;
+    const data = await response.json();
+
+    if (!response.ok) {
+      const errMsg = data?.error?.message || `HTTP ${response.status}`;
+      showStatus('error', `Groq error: ${errMsg}`);
+      btn.disabled = false;
+      return;
+    }
+
+    const content = data.choices?.[0]?.message?.content || '';
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch(e) {
+      parsed = { raw_response: content, parse_error: 'Response was not valid JSON' };
+    }
+
+    responseBox.textContent = JSON.stringify(parsed, null, 2);
+    responseBox.style.display = 'block';
+
+    document.getElementById('metaModel').textContent = data.model || model;
+    document.getElementById('metaLatency').textContent = `${latency}ms`;
+    document.getElementById('metaTokens').textContent = data.usage?.total_tokens || '—';
+    document.getElementById('metaStatus').textContent = '✅ Connected';
+    metaRow.style.display = 'flex';
+
+    showStatus('success', `✅ Groq API connected successfully. Model: ${data.model}. Latency: ${latency}ms.`);
+
+  } catch(err) {
+    showStatus('error', `Connection error: ${err.message}. Check CORS or network.`);
+  }
+
+  btn.disabled = false;
+}
+
+function showStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.className = `status ${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
