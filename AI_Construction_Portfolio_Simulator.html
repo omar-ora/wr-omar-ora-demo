@@ -1,0 +1,2645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Construction Portfolio Scenario Simulator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+:root{
+  --navy:#183f66; --navy2:#214e79; --ink:#17263a; --muted:#63809e;
+  --line:#d5e2ee; --bg:#f5f8fb; --blue:#2c86d9; --blue-dark:#1f6fae;
+  --red:#c73730; --red-dark:#9c2b25; --red-line:#efb8b4;
+  --amber:#dd950e; --amber-border:#b87807; --green:#168147; --green-soft:#eaf8ef;
+  --shadow:0 10px 23px rgba(31,72,109,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);font-family:Inter,Arial,sans-serif;
+  background:
+    linear-gradient(rgba(36,80,120,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(36,80,120,.035) 1px,transparent 1px),var(--bg);
+  background-size:38px 38px;
+}
+button{font-family:Inter,Arial,sans-serif;cursor:pointer}
+.wrap{max-width:1520px;margin:0 auto;padding:0 64px}
+
+/* Institutional header */
+header{
+  min-height:116px;color:#fff;background:linear-gradient(105deg,#193d62,#214e7a);
+  box-shadow:0 2px 9px rgba(13,39,66,.22);
+}
+.header-inner{min-height:116px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.eyebrow{color:rgba(255,255,255,.68);font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+h1{margin:4px 0 2px;font-size:26px;letter-spacing:-.035em;line-height:1.05}
+.subtitle{font-size:15px;color:rgba(255,255,255,.8);white-space:nowrap}
+.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.badge{
+  white-space:nowrap;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.89);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:650;
+}
+
+/* First-screen controls */
+.toolbar{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px;margin:8px 0 10px}
+.toolbar-note{
+  max-width:620px;
+  font-size:14px;
+  line-height:1.35;
+  color:#4f6d8b;
+  font-weight:760;
+}
+.toolbar-note b{color:#294b70}
+.toolbar-actions{display:flex;gap:8px;align-items:center}
+.generate{
+  min-height:78px;padding:0 40px;border:0;border-radius:11px;
+  background:linear-gradient(135deg,#ca3730,#ad2b26);color:#fff;font-size:12px;font-weight:850;
+  letter-spacing:.025em;box-shadow:0 6px 13px rgba(175,46,39,.22);
+}
+.reset{
+  min-height:78px;padding:0 36px;border:1px solid var(--amber-border);border-radius:11px;
+  background:var(--amber);color:#111;font-size:12px;font-weight:850;letter-spacing:.025em;
+}
+
+/* Compact contingency */
+.contingency{
+  border:2px solid var(--red-line);border-left:8px solid var(--red);border-radius:18px;
+  background:linear-gradient(110deg,#fff3f2,#fffafa);padding:15px 21px 14px;
+  box-shadow:0 8px 18px rgba(172,47,42,.09);
+}
+.cont-top{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.cont-kicker{font-size:11px;color:var(--red);font-weight:900;text-transform:uppercase;letter-spacing:.075em}
+.cont-title{margin-top:3px;color:var(--red-dark);font-size:20px;font-weight:850;letter-spacing:-.025em}
+.seed{
+  flex:none;font:700 11px "JetBrains Mono",monospace;color:#982a24;background:#fff;
+  border:1px solid var(--red-line);border-radius:999px;padding:7px 11px;
+}
+.cont-facts{display:grid;grid-template-columns:1.05fr 1fr 1fr 1.15fr;gap:8px;margin-top:11px}
+.fact{border-left:1px solid #ebc4c0;padding-left:12px}
+.fact:first-child{border-left:0;padding-left:0}
+.fact-label{color:#9e4a44;font-size:9px;text-transform:uppercase;letter-spacing:.075em;font-weight:900}
+.fact-value{margin-top:3px;color:#70302c;font:700 12px "JetBrains Mono",monospace}
+
+/* Expanded AI panel */
+.ai{
+  margin-top:8px;height:330px;border:2px solid #a9d1f3;border-radius:18px;
+  background:linear-gradient(180deg,#eaf7ff 0%,#f8fcff 100%);
+  box-shadow:0 11px 22px rgba(38,104,158,.10);overflow:hidden;position:relative;
+}
+.ai::before{content:"";height:6px;background:linear-gradient(90deg,#2382d6,#79bdf4);position:absolute;top:0;left:0;right:0}
+.ai-head{height:52px;padding:9px 24px 7px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.ai-id{display:flex;align-items:center;gap:12px}
+.logo{
+  width:34px;height:34px;display:grid;place-items:center;color:#fff;border-radius:10px;
+  background:linear-gradient(135deg,#1871c6,#40a4ee);font-size:14px;font-weight:900;
+  box-shadow:0 6px 12px rgba(26,113,195,.22);
+}
+.ai-name{font-size:18px;font-weight:850;color:#183d63;letter-spacing:-.025em}
+.ai-desc{font-size:10.5px;color:#5f85a8;margin-top:2px}
+.live{
+  display:flex;align-items:center;gap:7px;color:#2879ba;background:#fff;border:1px solid #b6d6ee;
+  border-radius:999px;padding:6px 11px;font-size:10px;font-weight:900;letter-spacing:.04em;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#2b92d9}
+.ai-status-group{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.verify-badge{
+  display:flex;align-items:center;gap:6px;color:#946006;background:#fff8ea;border:1px solid #ecc978;
+  border-radius:999px;padding:5px 10px;font-size:9px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;
+}
+.verify-badge::before{content:"";width:6px;height:6px;border-radius:1px;background:#c9930f;flex:none}
+.chat{
+  margin:0 24px 10px;
+  height:260px;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid #d1e1ef;
+  border-radius:16px;
+  box-shadow:0 7px 15px rgba(33,85,127,.07);
+  padding:11px 16px 10px;
+}
+.chat-grid{
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1.5fr .88fr;
+  gap:10px;
+}
+.narrative-panel{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  border-right:1px solid #e4edf5;
+  padding-right:14px;
+  display:flex;
+  flex-direction:column;
+}
+.narrative-head{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.avatar{
+  flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:7px;
+  background:#e5f3ff;color:#2676b7;font-size:10px;font-weight:900;
+}
+.label{color:#2b78b7;font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:900}
+.response-scroll{
+  flex:1 1 0;
+  min-height:0;
+  height:0;
+  overflow-y:scroll !important;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  padding:0 12px 0 0;
+  scrollbar-gutter:stable;
+  scrollbar-color:#4e9ed9 #e6f0f8;
+  scrollbar-width:auto;
+  mask-image:linear-gradient(to bottom, #000 calc(100% - 26px), transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 26px), transparent 100%);
+}
+.response-scroll::-webkit-scrollbar{width:14px}
+.response-scroll::-webkit-scrollbar-track{background:#e6f0f8;border:1px solid #c7dced;border-radius:10px}
+.response-scroll::-webkit-scrollbar-thumb{background:#4e9ed9;border:2px solid #e6f0f8;border-radius:10px;min-height:32px}
+.response-scroll::-webkit-scrollbar-thumb:hover{background:#287dbd}
+.response-scroll p{
+  margin:0 0 9px;color:#1d2e44;font-size:12.4px;line-height:1.42;font-weight:620;
+}
+.response-scroll p:last-child{margin-bottom:0}
+.response-scroll strong{font-weight:850}
+.response-section{
+  margin:8px 0 5px;padding-top:7px;border-top:1px solid #e8eff5;
+  color:#2b78b7;font-size:10px;text-transform:uppercase;letter-spacing:.085em;font-weight:900;
+}
+.decision-column{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr) 22px;
+  gap:8px;
+}
+.decision-card{
+  min-height:0;
+  overflow:hidden;
+  padding:9px 12px;
+  background:#fbfdff;
+  border:1px solid #c9def2;
+  border-left:4px solid #2373b4;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+}
+.decision-card.ceo{
+  background:#f8fafd;
+  border-color:#c7d3e2;
+  border-left-color:var(--navy);
+}
+.decision-card.ora{
+  border-left-color:#2373b4;
+}
+.decision-label{
+  margin-bottom:5px;color:#2373b4;font-size:10px;text-transform:uppercase;
+  letter-spacing:.09em;font-weight:900;flex:none;
+}
+.decision-card.ceo .decision-label{color:var(--navy)}
+.decision-scroll{
+  flex:1 1 0;
+  min-height:0;
+  height:0;
+  overflow-y:scroll !important;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  padding-right:8px;
+  color:#21334a;
+  font-size:11.4px;
+  line-height:1.34;
+  font-weight:750;
+  scrollbar-gutter:stable;
+  scrollbar-color:#4e9ed9 #e6f0f8;
+  scrollbar-width:auto;
+  mask-image:linear-gradient(to bottom, #000 calc(100% - 18px), transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 18px), transparent 100%);
+}
+.decision-scroll::-webkit-scrollbar{width:14px}
+.decision-scroll::-webkit-scrollbar-track{background:#e6f0f8;border:1px solid #c7dced;border-radius:10px}
+.decision-scroll::-webkit-scrollbar-thumb{background:#4e9ed9;border:2px solid #e6f0f8;border-radius:10px;min-height:32px}
+.decision-scroll::-webkit-scrollbar-thumb:hover{background:#287dbd}
+.stream-row{
+  display:flex;align-items:center;gap:7px;color:#5a7694;font-size:9.8px;font-weight:650;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.dots{display:flex;gap:4px;flex:none}
+.dots i{width:5px;height:5px;border-radius:50%;background:#3894dc;animation:pulse 1.1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.13s}.dots i:nth-child(3){animation-delay:.26s}
+@keyframes pulse{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.ai-process{
+  color:#7f91a6 !important;
+  font-weight:650 !important;
+  line-height:1.5;
+}
+.ai-process p{
+  margin:0 0 9px !important;
+  color:#7f91a6 !important;
+  font-weight:650 !important;
+}
+.ai-process .phase{
+  display:block;
+  margin-bottom:7px;
+  color:#7f91a6;
+}
+.ai-process .phase::before{
+  content:"";
+  display:inline-block;
+  width:6px;
+  height:6px;
+  margin-right:7px;
+  border-radius:50%;
+  background:#8aa3bb;
+  vertical-align:1px;
+}
+
+.ai-json-btn{
+  flex:none;
+  min-height:24px;
+  padding:0 10px;
+  border:1px solid #b6d6ee;
+  border-radius:999px;
+  background:#fff;
+  color:#2879ba;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+}
+.ai-json-btn:hover{background:#edf7ff}
+.hidden{display:none!important}
+
+/* Below first screen */
+.dashboard{padding:12px 0 45px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow)}
+.metric-label{font-size:9px;letter-spacing:.075em;text-transform:uppercase;font-weight:850;color:#667f97}
+.metric-value{margin-top:7px;font:700 19px "JetBrains Mono",monospace;color:var(--navy)}
+.metric-note{font-size:10.5px;color:#6f8499;margin-top:5px}
+.metric.red .metric-value{color:var(--red)} .metric.green .metric-value{color:var(--green)}
+.metric.anchor{border:2px solid var(--green);background:var(--green-soft)}
+.metric.anchor .metric-value{font-size:23px}
+.metric.anchor .metric-label{color:var(--green)}
+.status-pill{
+  display:inline-block;margin-top:7px;font-size:11px;font-weight:850;letter-spacing:.04em;
+  border-radius:999px;padding:4px 10px;background:#fff2d6;color:#946006;
+}
+.ora-impact{
+  margin-top:15px;background:#fff;border:1px solid var(--line);border-radius:15px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+.ora-impact-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.ora-impact-head h3{margin:0;font-size:13px;color:var(--navy)}
+.ora-impact-head .chip{
+  font-size:9.5px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;color:var(--green);
+  background:var(--green-soft);border-radius:999px;padding:5px 10px;white-space:nowrap;
+}
+.ora-impact-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center}
+.ora-col{padding:12px 14px;border-radius:12px;border:1px solid var(--line)}
+.ora-col.without{background:#fff6f5;border-color:var(--red-line)}
+.ora-col.with{background:var(--green-soft);border-color:#bfe3cc}
+.ora-col-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:850;color:#6d8399}
+.ora-col.without .ora-col-label{color:var(--red-dark)}
+.ora-col.with .ora-col-label{color:var(--green)}
+.ora-col-value{margin-top:6px;font:700 20px "JetBrains Mono",monospace;color:var(--ink)}
+.ora-col-note{margin-top:4px;font-size:10.5px;color:#6d8399}
+.ora-savings{text-align:center;padding:8px 16px}
+.ora-savings-value{font:700 26px "JetBrains Mono",monospace;color:var(--green)}
+.ora-savings-label{margin-top:4px;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:850;color:#6d8399}
+.ora-impact-riskline{margin-top:13px;padding-top:11px;border-top:1px solid #edf1f5;font-size:10.5px;color:#6d8399;line-height:1.4}
+@media(max-width:820px){.ora-impact-grid{grid-template-columns:1fr}.ora-savings{text-align:left;padding:4px 0}}
+.grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:15px;margin-top:15px}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px 18px;box-shadow:var(--shadow)}
+.card h3{font-size:13px;color:var(--navy);margin:0 0 12px}
+.event-line{display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid #eef2f5}
+.event-line:last-child{border-bottom:0}
+.num{width:25px;height:25px;border-radius:7px;display:grid;place-items:center;background:#eaf5ff;color:#2e679a;font-size:10px;font-weight:850}
+.event-title{font-size:12px;font-weight:760}.event-copy{font-size:10.5px;color:#6d8399;margin-top:2px}
+.pill{font-size:9px;border-radius:999px;padding:4px 7px;font-weight:850}.pill-amber{background:#fff2d6;color:#946006}.pill-red{background:#fff0ef;color:var(--red)}.pill-green{background:var(--green-soft);color:var(--green)}
+.barrow{display:grid;grid-template-columns:76px 1fr 58px;gap:8px;align-items:center;margin:12px 0}
+.barrow label{font-size:10.5px;font-weight:750;color:#435870}.track{height:13px;border-radius:99px;background:#e9eff5;overflow:hidden}.fill{height:100%;border-radius:99px}.base{width:48%;background:#9ec7ef}.current{width:74%;background:#e47e75}.recovery{width:54%;background:#75bd93}.cost{font:700 10px "JetBrains Mono",monospace;color:#52677c;text-align:right}.footerhint{font-size:10.5px;color:#6e849a;margin-top:10px;text-align:right}
+.structural-empty{
+  display:flex;align-items:flex-start;gap:10px;padding:16px 4px 8px;color:#5f7386;font-size:11px;line-height:1.45;
+}
+.structural-empty-icon{
+  flex:none;width:24px;height:24px;border-radius:50%;background:var(--green-soft);
+  color:var(--green);display:grid;place-items:center;font-size:13px;margin-top:1px;font-weight:900;
+}
+.structural-empty-title{font-size:12px;font-weight:850;color:var(--green);margin-bottom:3px}
+
+
+
+/* Scenario charts */
+.scenario-charts{
+  display:grid;
+  grid-template-columns:1.12fr .88fr;
+  gap:15px;
+  margin-top:15px;
+}
+.chart-card{
+  min-height:282px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px 18px;
+  box-shadow:var(--shadow);
+}
+.chart-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:13px;
+}
+.chart-head h3{
+  margin:0;
+  color:var(--navy);
+  font-size:13px;
+}
+.chart-sub{
+  margin-top:3px;
+  color:#6b8198;
+  font-size:10.5px;
+  line-height:1.35;
+}
+.chart-legend{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  font-size:9px;
+  font-weight:800;
+  color:#627991;
+}
+.legend-item{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.legend-base{background:#9fc8ee}.legend-scenario{background:#e7877f}.legend-recovery{background:#76bd95}
+
+.sequence-axis{
+  display:grid;
+  grid-template-columns:64px repeat(8,1fr);
+  align-items:end;
+  margin:0 0 5px;
+  color:#7890a6;
+  font:700 8.5px "JetBrains Mono",monospace;
+}
+.sequence-axis span{text-align:center}
+.sequence-axis span:first-child{text-align:left}
+.sequence-list{display:flex;flex-direction:column;gap:7px}
+.sequence-row{display:grid;grid-template-columns:64px 1fr 34px;gap:9px;align-items:center}
+.sequence-delta{
+  text-align:right;font:700 10px "JetBrains Mono",monospace;color:#7890a6;
+}
+.sequence-delta.shifted{color:var(--red-dark)}
+.sequence-label{
+  color:#3b546e;
+  font:700 10px "JetBrains Mono",monospace;
+}
+.sequence-track{
+  position:relative;
+  height:24px;
+  overflow:hidden;
+  border:1px solid #e4edf5;
+  border-radius:7px;
+  background:
+    repeating-linear-gradient(90deg,transparent 0,transparent calc(12.5% - 1px),#edf3f8 calc(12.5% - 1px),#edf3f8 12.5%),
+    #fbfdff;
+}
+.seq-bar{
+  position:absolute;
+  height:6px;
+  border-radius:5px;
+  min-width:14px;
+}
+.seq-bar.base{top:3px;background:#9fc8ee}
+.seq-bar.scenario{top:9px;background:#e7877f}
+.seq-bar.recovery{top:15px;background:#76bd95}
+.sequence-note{
+  margin-top:10px;
+  color:#6c8297;
+  font-size:10.3px;
+  line-height:1.4;
+}
+
+.queue-list{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.queue-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 105px 70px;
+  gap:8px;
+  align-items:center;
+}
+.queue-name{font-size:11px;font-weight:760;color:#24384e;line-height:1.22}
+.queue-meta{font-size:9.5px;color:#72889c;margin-top:3px}
+.queue-bar{
+  height:11px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#edf2f6;
+}
+.queue-fill{height:100%;border-radius:999px;background:#e7877f}
+.queue-empty{
+  display:flex;align-items:flex-start;gap:10px;padding:14px 4px 6px;
+}
+.queue-empty-icon{
+  flex:none;width:22px;height:22px;border-radius:50%;background:var(--green-soft);
+  color:var(--green);display:grid;place-items:center;font-size:13px;margin-top:1px;
+}
+.queue-empty-title{font-size:12px;font-weight:800;color:var(--green)}
+.queue-empty-sub{font-size:11px;color:#5f7386;margin-top:3px;line-height:1.4}
+.queue-value{
+  text-align:right;
+  color:#506980;
+  font:700 9.5px "JetBrains Mono",monospace;
+  white-space:nowrap;
+}
+.queue-footer{
+  margin-top:17px;
+  padding-top:10px;
+  border-top:1px solid #edf2f5;
+  color:#6d8399;
+  font-size:10.3px;
+  line-height:1.4;
+}
+@media(max-width:1050px){
+  .scenario-charts{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .subtitle{white-space:normal}
+  .sequence-axis{grid-template-columns:48px repeat(8,1fr)}
+  .sequence-row{grid-template-columns:48px 1fr 30px}
+  .chart-head{align-items:flex-start;flex-direction:column}
+  .chart-legend{justify-content:flex-start}
+}
+
+/* Records */
+.records-shell{margin-top:15px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.records-head{padding:15px 18px;border-bottom:1px solid var(--line);background:#f9fbfd;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.records-title{font-size:14px;font-weight:850;color:var(--navy)}.records-sub{font-size:10.5px;color:var(--muted);margin-top:2px}.records-actions{display:flex;align-items:center;gap:9px}
+.clear-all-btn{min-height:31px;padding:0 12px;border-radius:8px;color:#fff;background:linear-gradient(135deg,#ca3730,#ad2b26);border:1px solid var(--red-dark);font-size:10px;font-weight:850;letter-spacing:.05em}
+.records-count{font:700 11px "JetBrains Mono",monospace;color:#45617d;border:1px solid #d8e4f0;background:#fff;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.records-list{padding:8px 10px}
+.record-row{display:grid;grid-template-columns:118px 1fr 105px 80px 80px;gap:8px;align-items:center;padding:11px 9px;border-bottom:1px solid #edf1f5;border-radius:9px;cursor:pointer}
+.record-row:hover{background:#f7fafd}
+.record-row:last-child{border-bottom:0}.record-row.selected{background:#edf7ff;outline:1px solid #b6d7f3}
+.record-id-badge{width:max-content;min-width:106px;font:700 10.5px "JetBrains Mono",monospace;color:#111;background:rgba(216,146,18,.80);border:1px solid #b77508;border-radius:7px;padding:6px 8px;text-align:center;white-space:nowrap}
+.record-summary{font-size:12px;font-weight:750;color:#24384e;line-height:1.3}.record-meta{font-size:10.5px;color:#6b8198;margin-top:3px}
+.status{font-size:9.5px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;border-radius:999px;padding:5px 7px;text-align:center}.status.run{background:var(--green-soft);color:var(--green)}.status.idle{background:#eef2f6;color:#60768f}
+.run-btn{min-height:31px;border:0;border-radius:8px;color:#fff;background:var(--blue-dark);font-size:10px;font-weight:850;letter-spacing:.05em}
+.clear-btn{min-height:31px;border-radius:8px;color:#111;background:var(--amber);border:1px solid var(--amber-border);font-size:10px;font-weight:850;letter-spacing:.05em}
+.run-btn:disabled,.clear-btn:disabled{
+  cursor:not-allowed;
+  opacity:.38;
+  filter:grayscale(.2);
+  box-shadow:none;
+}
+.records-foot{padding:12px 18px;background:#fbfcfe;border-top:1px solid #edf1f5;font-size:10.5px;color:#6b8096}.empty{padding:26px;text-align:center;color:#6e849a;font-size:12px}
+
+@media(max-width:1050px){
+  .wrap{padding:0 28px}.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}
+  .record-row{grid-template-columns:110px 1fr 85px 74px 74px}
+}
+@media(max-width:820px){
+  .ai{height:auto;min-height:650px}.chat{height:auto;min-height:550px}.chat-grid{grid-template-columns:1fr}.narrative-panel{height:260px;border-right:0;border-bottom:1px solid #e4edf5;padding-right:0;padding-bottom:12px}.decision-column{height:265px;grid-template-rows:1fr 1fr 28px}
+}
+@media(max-width:760px){
+  .wrap{padding:0 14px}.header-inner{padding:18px 0;align-items:flex-start;flex-direction:column}.badges{justify-content:flex-start}
+  .toolbar{align-items:flex-start;flex-direction:column;padding:14px 0}.toolbar-actions{width:100%}.toolbar-actions button{flex:1}
+  .cont-top{align-items:flex-start;flex-direction:column}.cont-facts{grid-template-columns:1fr 1fr}.fact:nth-child(3){border-left:0;padding-left:0}
+  .ai-head{padding:18px 16px 13px}.ai-name{font-size:17px}.chat{margin:0 12px 13px;padding:15px}.metrics{grid-template-columns:1fr}
+  .records-head{align-items:flex-start;flex-direction:column}.records-list{overflow-x:auto}.record-row{min-width:620px}
+}
+
+.json-modal{
+  position:fixed;inset:0;z-index:9999;background:rgba(10,28,46,.62);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.json-modal.open{display:flex}
+.json-box{
+  width:min(920px,96vw);height:min(720px,88vh);background:#fff;border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.32);border:1px solid #bfd4e7;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.json-head{
+  padding:14px 18px;background:#f4f8fc;border-bottom:1px solid #dbe8f2;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.json-title{font-size:13px;font-weight:850;color:#183f66}
+.json-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.json-action{
+  min-height:32px;padding:0 12px;border-radius:8px;border:1px solid #b9d3e9;
+  background:#fff;color:#1f6fae;font-size:10px;font-weight:850;letter-spacing:.04em;
+}
+.json-close{background:#ca3730;color:#fff;border-color:#9c2b25}
+.json-text{
+  flex:1;width:100%;border:0;resize:none;padding:16px 18px;
+  font:600 11px "JetBrains Mono",monospace;line-height:1.45;color:#1d2e44;
+  outline:none;background:#fbfdff;
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap header-inner">
+    <div>
+      <div class="eyebrow">Operations Research Analyst · Live Model Demonstration</div>
+      <h1>AI Construction Portfolio Scenario Simulator</h1>
+      <div class="subtitle">W Rondon Construction LLC · Controlled Scenario Analysis · Executive Decision Support</div>
+    </div>
+    <div class="badges">
+      <span class="badge">Case No. G-100-25134-975276</span>
+      <span class="badge">Sequence Optimization + Queue Theory</span>
+      <span class="badge">AI Executive Assessment</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="toolbar">
+      <div class="toolbar-note"><b>Portfolio baseline loaded.</b> Metrics, model detail, charts, and saved scenario records continue below this first screen.</div>
+      <div class="toolbar-actions">
+        <button type="button" class="generate" id="generateBtn">GENERATE CONTINGENCY</button>
+        <button type="button" class="reset" id="resetBtn">RESET TO BASELINE</button>
+      </div>
+    </section>
+
+    <section class="contingency">
+      <div class="cont-top">
+        <div>
+          <div class="cont-kicker">Generated portfolio contingency</div>
+          <div class="cont-title" id="contTitle">Framing subcontractor availability delay affecting W7</div>
+        </div>
+        <div class="seed" id="seedBadge">S-2026-016 · Seed 19238</div>
+      </div>
+      <div class="cont-facts">
+        <div class="fact"><div class="fact-label">Direct project</div><div class="fact-value" id="directProject">W7 · Exterior Works</div></div>
+        <div class="fact"><div class="fact-label">Affected contractor</div><div class="fact-value" id="affectedResource">Framing Subcontractor</div></div>
+        <div class="fact"><div class="fact-label">Disruption window</div><div class="fact-value" id="window">Day 4–7</div></div>
+        <div class="fact"><div class="fact-label">Event type</div><div class="fact-value" id="eventType">Subcontractor availability delay</div></div>
+      </div>
+    </section>
+
+    <section class="ai">
+      <div class="ai-head">
+        <div class="ai-id">
+          <div class="logo">AI</div>
+          <div>
+            <div class="ai-name">AI Executive Assessment</div>
+            <div class="ai-desc">Live narrative produced from the integrated calculated scenario package</div>
+          </div>
+        </div>
+        <div class="ai-status-group">
+          <div class="live"><span class="live-dot"></span><span id="aiState">RESPONSE READY</span></div>
+          <div class="verify-badge">Awaiting verified field inputs</div>
+        </div>
+      </div>
+
+      <div class="chat">
+        <div class="chat-grid">
+          <div class="narrative-panel">
+            <div class="narrative-head">
+              <div class="avatar">AI</div>
+              <div class="label">Executive assessment</div>
+            </div>
+            <div class="response-scroll" id="narrative" aria-label="AI narrative scroll area">
+              <p><strong>The framing subcontractor availability delay affects the planned contractor sequence for W7 and changes the work window available to the next assigned project.</strong> Under the recalculated sequence, this is not limited to a local two-day transfer issue. The route change modifies the time at which shared subcontractor capacity becomes available to follow-on work, creating portfolio wait exposure if the original operating order is retained.</p>
+              <div class="response-section">Portfolio effect</div>
+              <p>The scenario package identifies the affected work window and evaluates the related queue condition across the active portfolio. The sequence is recalculated under the simulated constraint, while Queue Theory measures the waiting exposure created by the revised availability window.</p>
+              <div class="response-section">Calculated alternatives</div>
+              <p>Maintaining the original route protects the previous sequence but leaves the portfolio exposed to accumulated waiting cost. Re-sequencing the shared subcontractor capacity can reduce the W8 direct delay but may transfer exposure to another project. The modeled recovery alternative is evaluated against the estimated avoidable cost of $2,120 and must remain economically justified after verified field inputs are available.</p>
+              <div class="response-section">Decision boundary</div>
+              <p>This assessment is based on the generated controlled contingency and the parameters currently loaded in the model. It does not confirm an actual field condition. The recovery action requires confirmation of contractor availability, project readiness, transfer timing, and the applicable mitigation rate before management authorization.</p>
+            </div>
+          </div>
+
+          <div class="decision-column">
+            <div class="decision-card ceo">
+              <div class="decision-label">Action for CEO</div>
+              <div class="decision-scroll" id="ceoAction">Approve a recovery action only if the verified mitigation cost remains below the calculated avoidable portfolio exposure. The decision should preserve the priority work window identified by the recalculated sequence, rather than simply restoring the original route. If the confirmed cost exceeds the avoidable exposure, retain the modeled sequence and request an updated scenario before committing additional expenditure. Confirm that the selected recovery protects the highest-priority work window and does not displace a more critical activity. Require a refreshed scenario result whenever actual field conditions differ from the loaded assumptions.</div>
+            </div>
+            <div class="decision-card ora">
+              <div class="decision-label">Verification for ORA</div>
+              <div class="decision-scroll" id="oraAction">Validate the revised Framing Subcontractor availability window, W7 readiness, and the resulting route assumptions for every project exposed to the queue condition. Confirm the transfer timing, identify any dependency that changes the modeled work window, and rerun the scenario if the actual disruption duration differs from the controlled simulated range. Compare confirmed project readiness against the recalculated route and record each changed assumption before recommending execution. Escalate for a new scenario run when the disruption extends beyond the modeled period or affects a resource not represented in the loaded portfolio.</div>
+            </div>
+            <div class="stream-row">
+              <span id="streamingText">Assessment generated from calculated scenario results.</span>
+              <div class="dots hidden" id="dots"><i></i><i></i><i></i></div>
+              <a class="ai-json-btn hidden" id="aiJsonBtn" download href="#">DOWNLOAD AI AUDIT LOG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="metrics">
+        <div class="metric red"><div class="metric-label">Incremental portfolio cost</div><div class="metric-value" id="metricCost">+$3,215</div><div class="metric-note">Compared with baseline.</div></div>
+        <div class="metric"><div class="metric-label">Projects affected</div><div class="metric-value" id="metricProjects">3</div><div class="metric-note">Direct and queue exposure.</div></div>
+        <div class="metric"><div class="metric-label">Sequence status</div><div class="status-pill" id="sequenceStatusPill">CHANGED</div><div class="metric-note" id="sequenceStatusNote">Sequence engine recalculated route.</div></div>
+        <div class="metric green anchor"><div class="metric-label">Avoidable cost</div><div class="metric-value" id="metricAvoidable">$2,120</div><div class="metric-note">With calculated recovery — decision anchor.</div></div>
+      </div>
+
+      <section class="ora-impact">
+        <div class="ora-impact-head">
+          <h3>Portfolio Impact — Without ORA vs. With ORA</h3>
+          <span class="chip">Consistent across Sequence Optimization · Queue Theory · Exhibits</span>
+        </div>
+        <div class="ora-impact-grid">
+          <div class="ora-col without">
+            <div class="ora-col-label">Without ORA</div>
+            <div class="ora-col-value" id="oraWithoutValue">$3,215</div>
+            <div class="ora-col-note">Original sequence held, full scenario cost absorbed.</div>
+          </div>
+          <div class="ora-col with">
+            <div class="ora-col-label">With ORA</div>
+            <div class="ora-col-value" id="oraWithValue">$1,095</div>
+            <div class="ora-col-note">Calculated recovery sequence applied.</div>
+          </div>
+          <div class="ora-savings">
+            <div class="ora-savings-value" id="oraSavingsPct">66%</div>
+            <div class="ora-savings-label">Portfolio savings</div>
+          </div>
+        </div>
+        <div class="ora-impact-riskline" id="oraImpactRisk">Savings reflect the modeled recovery for this controlled scenario only; execution remains subject to verified field inputs and management authorization.</div>
+      </section>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Integrated portfolio actions</h3>
+          <div class="event-line"><div class="num">1</div><div><div class="event-title">Contractor sequence recalculated</div><div class="event-copy">Contractor assignment re-evaluated across the active portfolio.</div></div><span class="pill pill-amber" id="actionSeqPill">CHANGED</span></div>
+          <div class="event-line"><div class="num">2</div><div><div class="event-title" id="queueActionTitle">Contractor queue evaluated</div><div class="event-copy" id="queueActionCopy">Queue status will reflect the selected scenario.</div></div><span class="pill pill-amber" id="queueActionPill">EVALUATED</span></div>
+          <div class="event-line"><div class="num">3</div><div><div class="event-title">Recovery alternative tested</div><div class="event-copy">Mitigation is evaluated against calculated avoidable exposure.</div></div><span class="pill pill-green">FEASIBLE</span></div>
+        </article>
+        <article class="card">
+          <h3>Structural wait-cost exposure</h3>
+          <div id="structuralExposurePanel"></div>
+        </article>
+      </div>
+
+
+      <section class="scenario-charts">
+        <article class="chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>Portfolio Sequence Delta</h3>
+              <div class="chart-sub">Baseline, scenario, and calculated recovery windows across W1–W8.</div>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot legend-base"></span>Baseline</span>
+              <span class="legend-item"><span class="legend-dot legend-scenario"></span>Scenario</span>
+              <span class="legend-item"><span class="legend-dot legend-recovery"></span>Recovery</span>
+            </div>
+          </div>
+          <div class="sequence-axis"><span>PROJECT</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+          <div class="sequence-list" id="sequenceDeltaChart"></div>
+          <div class="sequence-note" id="sequenceDeltaNote"></div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>Queue Exposure by Project</h3>
+              <div class="chart-sub">Waiting exposure concentration from the Queue Theory scenario output.</div>
+            </div>
+            <span class="pill pill-red">SCENARIO</span>
+          </div>
+          <div class="queue-list" id="queueExposureChart"></div>
+          <div class="queue-footer" id="queueExposureNote"></div>
+        </article>
+      </section>
+
+      <section class="records-shell">
+        <div class="records-head">
+          <div><div class="records-title">Saved Scenario Records</div><div class="records-sub">Each generated contingency is preserved. Click a record to enable RUN or CLEAR only for that scenario.</div></div>
+          <div class="records-actions"><button type="button" class="clear-all-btn" id="clearAllBtn">CLEAR ALL</button><div class="records-count" id="recordCount">4 RECORDS</div></div>
+        </div>
+        <div class="records-list" id="recordsList"></div>
+        <div class="records-foot">No record is selected by default. Click a row to select it and enable RUN and CLEAR for that record only. CLEAR ALL removes every saved record and cannot be undone.</div>
+      </section>
+    </section>
+  </div>
+</main>
+
+<script>
+/*
+INTEGRATION SAFETY CONTRACT v26_AI_TEXT_DOWNLOAD:
+- Page load: 0 Worker calls.
+- RESET: 0 Worker calls.
+- Row selection: 0 Worker calls.
+- RUN inside Saved Scenario Records: 0 Worker calls; it only restores saved AI response/JSON.
+- GENERATE CONTINGENCY: exactly 1 Worker call, guarded by isOraRunning + debounce + oraCallSource.
+*/
+/* v6: Worker call only on GENERATE CONTINGENCY. RUN restores saved record + saved AI JSON. */
+// ORA Worker Integration v5: no call on page load; call only on Generate Contingency and selected-record RUN.
+
+// POINT 3 FIX (approved): the 4 baseline records are no longer hand-typed
+// narrative/cost text. They are built from the SAME real engine used by
+// GENERATE CONTINGENCY (v14GenerateProjectCardMutation -> v14RunMcts ->
+// v14ApplyToScenario), using 4 FIXED seeds so every visitor sees the same
+// reproducible output. Zero Worker calls happen at page load: the AI
+// assessment below was generated ONCE, offline, before publishing this file,
+// and is stored here as static text — the same pattern already used for
+// generated scenarios' aiSections once GENERATE CONTINGENCY has run.
+//
+// REGENERATED 2026-07-08: the previous 4 fixed seeds/AI text predated the
+// multi-card mutation + real Queue reform, so the deterministic panel (cost,
+// sequence, Queue) had drifted completely away from what the AI narrative
+// described for the same "id" (e.g. the old text talked about a single
+// availability-day shift with Queue cost pinned at $0, while the reformed
+// engine now produces multi-card contractor contention with real Queue
+// exposure for those same seeds). These 4 entries were regenerated live
+// through GENERATE CONTINGENCY on the current engine, verified node-side to
+// match their audit logs exactly (cost, sequence, Queue all reproduced from
+// the seed), and their ids now come from the seed itself, not an arbitrary
+// 016-019 counter.
+const V14_INITIAL_SEED_CONFIG = [
+  {
+    id: "S-2026-047017",
+    seed: "1783487229480-47017",
+    generatedAt: "2026-07-08T05:07:13.433Z",
+    workerUrl: "https://generic-llm-proxy.omar-ora.workers.dev",
+    promptSentToAi: "===========================================================\nEXECUTIVE SCENARIO SUMMARY — SUPERSCRIPT v26\n===========================================================\n\nCASE\nAI Construction Portfolio Scenario Simulator\n\nEmployer\nW Rondon Construction LLC\n\nScenario ID\nS-2026-047017\n\nIrreversible Seed\n1783487229480-47017\n\n===========================================================\nSEED AUDIT — PROJECT CARD ONLY\n===========================================================\n\nSeed Rule\nThe seed modifies a multi-card Project Card package only. Project square footage remains fixed. Global matrices remain at default.\n\nProject Card affected\nW5\n\nFields changed\n- W5 trade/construction phase: Roofing → Interior Finish\n- W5 availability day: 4 → 16\n- W5 base duration (days): 6 → 10\n- W2 trade/construction phase: Framing → Interior Finish\n- W2 availability day: 2 → 12\n- W2 base duration (days): 10 → 12\n- W2 ORA risk buffer (days): 2 → 5\n\nAffected contractor\nInterior Crew\n\nExplanation\nSeed generated a multi-card contractor scenario package. Primary affected card: W5. Secondary contractor-contention card: W2. Changes: W5 trade/construction phase: Roofing → Interior Finish; W5 availability day: 4 → 16; W5 base duration (days): 6 → 10; W2 trade/construction phase: Framing → Interior Finish; W2 availability day: 2 → 12; W2 base duration (days): 10 → 12; W2 ORA risk buffer (days): 2 → 5. Global cost, reliability, pause-day, and logistics matrices remain unchanged.\n\n===========================================================\nSTOCHASTIC SEQUENCE OPTIMIZATION OUTPUT\n===========================================================\n\nOptimization iterations\n5000\n\nEvaluated sequences\n4682\n\nOptimal sequence\nW1 → W8 → W5 → W2 → W6 → W7 → W4 → W3\n\nAlternative sequence\nW1 → W8 → W5 → W4 → W3 → W6 → W2 → W7\n\nWorst sequence encountered\nW3 → W7 → W1 → W2 → W6 → W4 → W8 → W5\n\nPolynomial Delay Cost\n$25,832\n\nLogistics Cost\n$1,036\n\nContractor Queue Cost\n$26,584\n\nTotal Inefficiency Cost\n$53,452\n\nBaseline Total Cost (unmutated Project Cards, for reference only)\n$45,550\n\nModeled avoided exposure versus worst sequence encountered\n$15,460\n\nSequence Cost Formula Boundary\nDelay Cost is not invented by AI or the contingency. It is computed by the stochastic sequence optimization engine as fixed daily overhead plus nonlinear phase-value penalty:\nfixed overhead + daily phase value × (wait day / 10)^2, capped at 10 wait days.\n\n===========================================================\nCONTRACTOR QUEUE OUTPUT\n===========================================================\n\nQueue Rule\nQueue is contractor-based and date-aware. It does not generate a separate scenario.\n\nPrimary contractor bottleneck\nInterior Crew\n\nSecondary contractor bottleneck\nFoundation Crew\n\nUtilization indicator\n100%\n\nExpected wait\n19 days\n\nStructural wait exposure\n$18,464\n\nCapacity action boundary\nReview backup capacity for Interior Crew\n\nResidual constraint\nFoundation Crew\n\nQueue exposure\n- W5 · Interior Crew | Contractor: Interior Crew | Expected wait: 19.0 days | Exposure: $18,464\n- W8 · Foundation Crew | Contractor: Foundation Crew | Expected wait: 7.0 days | Exposure: $8,120\n\n===========================================================\nPORTFOLIO IMPACT\n===========================================================\n\nWithout ORA\nPortfolio-wide scenario exposure: $62,603\n\nWith ORA\nResidual modeled exposure after calculated recovery: $53,452\n\nModeled Avoidable Exposure\n$9,151\n\nModeled Improvement\n15%\n\nProject shifts / affected sequence\n- W1: +0 position/day indicator versus baseline\n- W8: +6 position/day indicator versus baseline\n- W5: +2 position/day indicator versus baseline\n- W2: +2 position/day indicator versus baseline\n- W6: +1 position/day indicator versus baseline\n- W7: +1 position/day indicator versus baseline\n- W4: +3 position/day indicator versus baseline\n- W3: +5 position/day indicator versus baseline\n\nAffected projects\nW5, W6, W2, W1\n\n===========================================================\nTASK\n===========================================================\n\nInterpret only the deterministic findings above.\nExplain how Project Card mutation, stochastic sequence optimization, and contractor Queue exposure interact.\nDo not invent mitigation actions.\nDo not treat modeled avoided exposure as realized savings.\nDo not say equipment unless the data explicitly says equipment.\nProduce ONLY:\n\nExecutive Interpretation\n\nCEO Strategic Decision\n\nORA Analytical Assessment.",
+    rawAiResponse: "Executive Interpretation\nThe Project Card mutation shifted W5 and W2 into the Interior Crew’s scope while extending their availability and duration parameters. When the stochastic sequence optimization engine evaluated 4,682 sequences, the optimal ordering (W1 → W8 → W5 → W2 → W6 → W7 → W4 → W3) produced a total inefficiency cost of $53,452, driven primarily by Contractor Queue Cost ($26,584) and Polynomial Delay Cost ($25,832). The same mutation generated a contractor-based queue whose primary bottleneck is the Interior Crew at 100 % utilization and 19 expected wait days, creating a Structural Wait Exposure of $18,464. The secondary Foundation Crew bottleneck adds a further $8,120 in queue exposure. Portfolio-wide, the ORA-informed sequence reduces modeled exposure from $62,603 to $53,452, indicating a 15 % modeled improvement that is consistent with the interaction between the re-phased cards and the queue-constrained contractor capacity.\n\nCEO Strategic Decision\nAuthorize continued use of the optimal sequence as the current planning baseline while maintaining the existing contractor capacity envelope; no capacity augmentation is required at this time.\n\nORA Analytical Assessment\nThe mutation-induced reallocation of W5 and W2 to Interior Crew directly feeds the 19-day expected wait that accounts for the majority of the $26,584 Contractor Queue Cost within the $53,452 total inefficiency figure. The stochastic engine’s selection of the W1-W8-W5-W2 ordering appears to minimize the nonlinear phase-value penalty component of Polynomial Delay Cost, yet the residual Foundation Crew constraint (7 days, $8,120) remains visible in the queue output. The 15 % modeled improvement ($9,151) is traceable to the difference between the unoptimized portfolio exposure ($62,603) and the optimized inefficiency cost ($53,452), confirming that sequence position shifts for W5 (+2) and W2 (+2) interact with the Interior Crew bottleneck to determine the residual exposure level.",
+    consistencyChecks: {"status": "PASS", "failed_count": 0, "checks": [{"check": "Mentions affected project", "ok": true, "expected": "W5"}, {"check": "Mentions affected contractor", "ok": true, "expected": "Interior Crew"}, {"check": "Mentions optimal sequence", "ok": true, "expected": "w1 → w8 → w5 → w2 → w6 → w7 → w4 → w3"}, {"check": "Does not invent non-portfolio projects", "ok": true, "expected": "Only W1–W8 allowed"}, {"check": "Does not use residual equipment terminology", "ok": true, "expected": "No equipment terminology"}, {"check": "Queue exposure language present when queue exists", "ok": true, "expected": "Queue exposure should be discussed"}, {"check": "Mentions or is compatible with total inefficiency cost", "ok": true, "expected": "$53,452"}]},
+    usage: {"prompt_tokens": 1312, "completion_tokens": 404, "total_tokens": 1716, "prompt_tokens_details": {"text_tokens": 1312, "audio_tokens": 0, "image_tokens": 0, "cached_tokens": 64}, "completion_tokens_details": {"reasoning_tokens": 0, "audio_tokens": 0, "accepted_prediction_tokens": 0, "rejected_prediction_tokens": 0}, "num_sources_used": 0, "cost_in_usd_ticks": 25828000},
+    precomputedAI: {
+      executive: "The Project Card mutation shifted W5 and W2 into the Interior Crew’s scope while extending their availability and duration parameters. When the stochastic sequence optimization engine evaluated 4,682 sequences, the optimal ordering (W1 → W8 → W5 → W2 → W6 → W7 → W4 → W3) produced a total inefficiency cost of $53,452, driven primarily by Contractor Queue Cost ($26,584) and Polynomial Delay Cost ($25,832). The same mutation generated a contractor-based queue whose primary bottleneck is the Interior Crew at 100 % utilization and 19 expected wait days, creating a Structural Wait Exposure of $18,464. The secondary Foundation Crew bottleneck adds a further $8,120 in queue exposure. Portfolio-wide, the ORA-informed sequence reduces modeled exposure from $62,603 to $53,452, indicating a 15 % modeled improvement that is consistent with the interaction between the re-phased cards and the queue-constrained contractor capacity.",
+      ceo: "Authorize continued use of the optimal sequence as the current planning baseline while maintaining the existing contractor capacity envelope; no capacity augmentation is required at this time.",
+      ora: "The mutation-induced reallocation of W5 and W2 to Interior Crew directly feeds the 19-day expected wait that accounts for the majority of the $26,584 Contractor Queue Cost within the $53,452 total inefficiency figure. The stochastic engine’s selection of the W1-W8-W5-W2 ordering appears to minimize the nonlinear phase-value penalty component of Polynomial Delay Cost, yet the residual Foundation Crew constraint (7 days, $8,120) remains visible in the queue output. The 15 % modeled improvement ($9,151) is traceable to the difference between the unoptimized portfolio exposure ($62,603) and the optimized inefficiency cost ($53,452), confirming that sequence position shifts for W5 (+2) and W2 (+2) interact with the Interior Crew bottleneck to determine the residual exposure level."
+    }
+  },
+  {
+    id: "S-2026-379910",
+    seed: "1783487269563-79910",
+    generatedAt: "2026-07-08T05:07:53.745Z",
+    workerUrl: "https://generic-llm-proxy.omar-ora.workers.dev",
+    promptSentToAi: "===========================================================\nEXECUTIVE SCENARIO SUMMARY — SUPERSCRIPT v26\n===========================================================\n\nCASE\nAI Construction Portfolio Scenario Simulator\n\nEmployer\nW Rondon Construction LLC\n\nScenario ID\nS-2026-379910\n\nIrreversible Seed\n1783487269563-79910\n\n===========================================================\nSEED AUDIT — PROJECT CARD ONLY\n===========================================================\n\nSeed Rule\nThe seed modifies a multi-card Project Card package only. Project square footage remains fixed. Global matrices remain at default.\n\nProject Card affected\nW5\n\nFields changed\n- W5 trade/construction phase: Roofing → Interior Finish\n- W5 availability day: 4 → 19\n- W5 base duration (days): 6 → 15\n- W5 ORA risk buffer (days): 1 → 9\n- W8 trade/construction phase: Foundation → Interior Finish\n- W8 availability day: 3 → 14\n- W8 base duration (days): 7 → 11\n- W4 availability day: 2 → 8\n- W4 ORA risk buffer (days): 2 → 8\n\nAffected contractor\nInterior Crew\n\nExplanation\nSeed generated a multi-card contractor scenario package. Primary affected card: W5. Secondary contractor-contention card: W8. Changes: W5 trade/construction phase: Roofing → Interior Finish; W5 availability day: 4 → 19; W5 base duration (days): 6 → 15; W5 ORA risk buffer (days): 1 → 9; W8 trade/construction phase: Foundation → Interior Finish; W8 availability day: 3 → 14; W8 base duration (days): 7 → 11; W4 availability day: 2 → 8; W4 ORA risk buffer (days): 2 → 8. Global cost, reliability, pause-day, and logistics matrices remain unchanged.\n\n===========================================================\nSTOCHASTIC SEQUENCE OPTIMIZATION OUTPUT\n===========================================================\n\nOptimization iterations\n5000\n\nEvaluated sequences\n4701\n\nOptimal sequence\nW2 → W8 → W5 → W6 → W7 → W4 → W1 → W3\n\nAlternative sequence\nW2 → W8 → W5 → W6 → W4 → W1 → W3 → W7\n\nWorst sequence encountered\nW3 → W7 → W2 → W4 → W8 → W5 → W1 → W6\n\nPolynomial Delay Cost\n$25,478\n\nLogistics Cost\n$1,015\n\nContractor Queue Cost\n$11,397\n\nTotal Inefficiency Cost\n$37,890\n\nBaseline Total Cost (unmutated Project Cards, for reference only)\n$45,550\n\nModeled avoided exposure versus worst sequence encountered\n$9,791\n\nSequence Cost Formula Boundary\nDelay Cost is not invented by AI or the contingency. It is computed by the stochastic sequence optimization engine as fixed daily overhead plus nonlinear phase-value penalty:\nfixed overhead + daily phase value × (wait day / 10)^2, capped at 10 wait days.\n\n===========================================================\nCONTRACTOR QUEUE OUTPUT\n===========================================================\n\nQueue Rule\nQueue is contractor-based and date-aware. It does not generate a separate scenario.\n\nPrimary contractor bottleneck\nInterior Crew\n\nSecondary contractor bottleneck\nFoundation Crew\n\nUtilization indicator\n100%\n\nExpected wait\n15 days\n\nStructural wait exposure\n$11,397\n\nCapacity action boundary\nReview backup capacity for Interior Crew\n\nResidual constraint\nFoundation Crew\n\nQueue exposure\n- W8 · Interior Crew | Contractor: Interior Crew | Expected wait: 15.0 days | Exposure: $11,397\n\n===========================================================\nPORTFOLIO IMPACT\n===========================================================\n\nWithout ORA\nPortfolio-wide scenario exposure: $42,369\n\nWith ORA\nResidual modeled exposure after calculated recovery: $37,890\n\nModeled Avoidable Exposure\n$4,479\n\nModeled Improvement\n11%\n\nProject shifts / affected sequence\n- W2: +1 position/day indicator versus baseline\n- W8: +6 position/day indicator versus baseline\n- W5: +2 position/day indicator versus baseline\n- W6: +2 position/day indicator versus baseline\n- W7: +2 position/day indicator versus baseline\n- W4: +2 position/day indicator versus baseline\n- W1: +6 position/day indicator versus baseline\n- W3: +5 position/day indicator versus baseline\n\nAffected projects\nW5, W6, W8, W2\n\n===========================================================\nTASK\n===========================================================\n\nInterpret only the deterministic findings above.\nExplain how Project Card mutation, stochastic sequence optimization, and contractor Queue exposure interact.\nDo not invent mitigation actions.\nDo not treat modeled avoided exposure as realized savings.\nDo not say equipment unless the data explicitly says equipment.\nProduce ONLY:\n\nExecutive Interpretation\n\nCEO Strategic Decision\n\nORA Analytical Assessment.",
+    rawAiResponse: "Executive Interpretation\nThe Project Card mutation shifted W5 and W8 into the Interior Crew’s scope while extending their availability and duration parameters, creating a single-contractor contention point that the stochastic sequence optimization and contractor queue models both register. The optimal sequence places W8 immediately after W2 and W5 immediately after W8, indicating that the sequencing model treats the Interior Crew bottleneck as the dominant ordering constraint. The queue model independently quantifies the same constraint as a 15-day expected wait and $11,397 Structural Wait Exposure, confirming that the sequencing cost of $37,890 already embeds this contractor-level delay. Portfolio-wide Inefficiency Exposure falls from $42,369 to $37,890 when the ORA-derived sequence is applied, a modeled improvement of 11 percent that is consistent with the interaction between the two models rather than with any change in underlying capacity.\n\nCEO Strategic Decision\nAccept the optimal sequence W2 → W8 → W5 → W6 → W7 → W4 → W1 → W3 as the current planning baseline for the mutated Project Card set.\n\nORA Analytical Assessment\nThe mutation-induced convergence of W5 and W8 onto the Interior Crew produces a contractor queue whose $11,397 Structural Wait Exposure is numerically identical to the Contractor Queue Cost line item within the $37,890 Total Inefficiency Cost, indicating that the sequencing model has internalized the queue output. The residual Foundation Crew constraint appears only in the queue model and does not alter the reported optimal sequence, suggesting that Foundation Crew capacity remains non-binding under the evaluated conditions. The 11 percent reduction in Portfolio-wide Inefficiency Exposure is consistent with the removal of higher-cost sequences that violate the Interior Crew ordering, while the unchanged global matrices imply that further exposure reduction would require either capacity augmentation or additional Project Card adjustments outside the current seed.",
+    consistencyChecks: {"status": "PASS", "failed_count": 0, "checks": [{"check": "Mentions affected project", "ok": true, "expected": "W5"}, {"check": "Mentions affected contractor", "ok": true, "expected": "Interior Crew"}, {"check": "Mentions optimal sequence", "ok": true, "expected": "w2 → w8 → w5 → w6 → w7 → w4 → w1 → w3"}, {"check": "Does not invent non-portfolio projects", "ok": true, "expected": "Only W1–W8 allowed"}, {"check": "Does not use residual equipment terminology", "ok": true, "expected": "No equipment terminology"}, {"check": "Queue exposure language present when queue exists", "ok": true, "expected": "Queue exposure should be discussed"}, {"check": "Mentions or is compatible with total inefficiency cost", "ok": true, "expected": "$37,890"}]},
+    usage: {"prompt_tokens": 1338, "completion_tokens": 366, "total_tokens": 1704, "prompt_tokens_details": {"text_tokens": 1338, "audio_tokens": 0, "image_tokens": 0, "cached_tokens": 64}, "completion_tokens_details": {"reasoning_tokens": 0, "audio_tokens": 0, "accepted_prediction_tokens": 0, "rejected_prediction_tokens": 0}, "num_sources_used": 0, "cost_in_usd_ticks": 25203000},
+    precomputedAI: {
+      executive: "The Project Card mutation shifted W5 and W8 into the Interior Crew’s scope while extending their availability and duration parameters, creating a single-contractor contention point that the stochastic sequence optimization and contractor queue models both register. The optimal sequence places W8 immediately after W2 and W5 immediately after W8, indicating that the sequencing model treats the Interior Crew bottleneck as the dominant ordering constraint. The queue model independently quantifies the same constraint as a 15-day expected wait and $11,397 Structural Wait Exposure, confirming that the sequencing cost of $37,890 already embeds this contractor-level delay. Portfolio-wide Inefficiency Exposure falls from $42,369 to $37,890 when the ORA-derived sequence is applied, a modeled improvement of 11 percent that is consistent with the interaction between the two models rather than with any change in underlying capacity.",
+      ceo: "Accept the optimal sequence W2 → W8 → W5 → W6 → W7 → W4 → W1 → W3 as the current planning baseline for the mutated Project Card set.",
+      ora: "The mutation-induced convergence of W5 and W8 onto the Interior Crew produces a contractor queue whose $11,397 Structural Wait Exposure is numerically identical to the Contractor Queue Cost line item within the $37,890 Total Inefficiency Cost, indicating that the sequencing model has internalized the queue output. The residual Foundation Crew constraint appears only in the queue model and does not alter the reported optimal sequence, suggesting that Foundation Crew capacity remains non-binding under the evaluated conditions. The 11 percent reduction in Portfolio-wide Inefficiency Exposure is consistent with the removal of higher-cost sequences that violate the Interior Crew ordering, while the unchanged global matrices imply that further exposure reduction would require either capacity augmentation or additional Project Card adjustments outside the current seed."
+    }
+  },
+  {
+    id: "S-2026-266544",
+    seed: "1783487300412-66544",
+    generatedAt: "2026-07-08T05:08:25.115Z",
+    workerUrl: "https://generic-llm-proxy.omar-ora.workers.dev",
+    promptSentToAi: "===========================================================\nEXECUTIVE SCENARIO SUMMARY — SUPERSCRIPT v26\n===========================================================\n\nCASE\nAI Construction Portfolio Scenario Simulator\n\nEmployer\nW Rondon Construction LLC\n\nScenario ID\nS-2026-266544\n\nIrreversible Seed\n1783487300412-66544\n\n===========================================================\nSEED AUDIT — PROJECT CARD ONLY\n===========================================================\n\nSeed Rule\nThe seed modifies a multi-card Project Card package only. Project square footage remains fixed. Global matrices remain at default.\n\nProject Card affected\nW3\n\nFields changed\n- W3 trade/construction phase: Site Operations → Drywall Labor\n- W3 availability day: 3 → 10\n- W3 base duration (days): 7 → 12\n- W3 ORA risk buffer (days): 1 → 8\n- W4 trade/construction phase: MEP Rough-in → Drywall Labor\n- W4 availability day: 2 → 8\n- W4 base duration (days): 9 → 11\n- W1 availability day: 1 → 6\n\nAffected contractor\nDrywall Subcontractor\n\nExplanation\nSeed generated a multi-card contractor scenario package. Primary affected card: W3. Secondary contractor-contention card: W4. Changes: W3 trade/construction phase: Site Operations → Drywall Labor; W3 availability day: 3 → 10; W3 base duration (days): 7 → 12; W3 ORA risk buffer (days): 1 → 8; W4 trade/construction phase: MEP Rough-in → Drywall Labor; W4 availability day: 2 → 8; W4 base duration (days): 9 → 11; W1 availability day: 1 → 6. Global cost, reliability, pause-day, and logistics matrices remain unchanged.\n\n===========================================================\nSTOCHASTIC SEQUENCE OPTIMIZATION OUTPUT\n===========================================================\n\nOptimization iterations\n5000\n\nEvaluated sequences\n4682\n\nOptimal sequence\nW5 → W4 → W6 → W1 → W2 → W3 → W7 → W8\n\nAlternative sequence\nW5 → W4 → W6 → W7 → W8 → W1 → W3 → W2\n\nWorst sequence encountered\nW3 → W6 → W2 → W7 → W1 → W5 → W8 → W4\n\nPolynomial Delay Cost\n$30,437\n\nLogistics Cost\n$686\n\nContractor Queue Cost\n$15,027\n\nTotal Inefficiency Cost\n$46,150\n\nBaseline Total Cost (unmutated Project Cards, for reference only)\n$45,550\n\nModeled avoided exposure versus worst sequence encountered\n$9,902\n\nSequence Cost Formula Boundary\nDelay Cost is not invented by AI or the contingency. It is computed by the stochastic sequence optimization engine as fixed daily overhead plus nonlinear phase-value penalty:\nfixed overhead + daily phase value × (wait day / 10)^2, capped at 10 wait days.\n\n===========================================================\nCONTRACTOR QUEUE OUTPUT\n===========================================================\n\nQueue Rule\nQueue is contractor-based and date-aware. It does not generate a separate scenario.\n\nPrimary contractor bottleneck\nDrywall Subcontractor\n\nSecondary contractor bottleneck\nFoundation Crew\n\nUtilization indicator\n100%\n\nExpected wait\n11 days\n\nStructural wait exposure\n$9,592\n\nCapacity action boundary\nReview backup capacity for Drywall Subcontractor\n\nResidual constraint\nFoundation Crew\n\nQueue exposure\n- W3 · Drywall Subcontractor | Contractor: Drywall Subcontractor | Expected wait: 11.0 days | Exposure: $9,592\n- W1 · Foundation Crew | Contractor: Foundation Crew | Expected wait: 5.0 days | Exposure: $5,435\n\n===========================================================\nPORTFOLIO IMPACT\n===========================================================\n\nWithout ORA\nPortfolio-wide scenario exposure: $54,475\n\nWith ORA\nResidual modeled exposure after calculated recovery: $46,150\n\nModeled Avoidable Exposure\n$8,325\n\nModeled Improvement\n15%\n\nProject shifts / affected sequence\n- W5: +4 position/day indicator versus baseline\n- W4: +2 position/day indicator versus baseline\n- W6: +3 position/day indicator versus baseline\n- W1: +3 position/day indicator versus baseline\n- W2: +3 position/day indicator versus baseline\n- W3: +3 position/day indicator versus baseline\n- W7: +0 position/day indicator versus baseline\n- W8: +0 position/day indicator versus baseline\n\nAffected projects\nW3, W4, W5\n\n===========================================================\nTASK\n===========================================================\n\nInterpret only the deterministic findings above.\nExplain how Project Card mutation, stochastic sequence optimization, and contractor Queue exposure interact.\nDo not invent mitigation actions.\nDo not treat modeled avoided exposure as realized savings.\nDo not say equipment unless the data explicitly says equipment.\nProduce ONLY:\n\nExecutive Interpretation\n\nCEO Strategic Decision\n\nORA Analytical Assessment.",
+    rawAiResponse: "Executive Interpretation\nThe Project Card mutation concentrated Drywall Subcontractor work on W3 and W4 while shifting their availability windows later in the calendar. Stochastic sequence optimization responded by placing both cards after W5 and W6, producing an optimal sequence whose total inefficiency cost of $46,150 is only $600 above the unmutated baseline. Queue Theory independently identifies the same Drywall Subcontractor as the primary bottleneck at 100 % utilization and an 11-day expected wait, generating $9,592 in structural wait exposure. The two models converge on the same contractor yet diverge in cost framing: the sequence model registers the exposure as Contractor Queue Cost ($15,027) within the inefficiency total, while the queue model isolates it as Structural Wait Exposure. The residual constraint listed for Foundation Crew ($5,435) is not altered by the sequence reordering, indicating that the mutation-induced contention on Drywall does not relieve pressure on the secondary resource.\n\nCEO Strategic Decision\nMaintain the computed optimal sequence W5 → W4 → W6 → W1 → W2 → W3 → W7 → W8 as the current execution baseline; no further sequencing change is indicated by the supplied outputs.\n\nORA Analytical Assessment\nThe interaction between models shows that the 15 % modeled improvement ($8,325) arises principally from repositioning W3 and W4 after higher-value upstream work, thereby reducing the nonlinear phase-value penalty embedded in Polynomial Delay Cost. However, the 11-day Drywall queue persists across both the optimal and alternative sequences, suggesting that sequence optimization alone does not relax the capacity constraint. Portfolio-wide Inefficiency Exposure remains $46,150 after ORA recovery, consistent with the sum of Polynomial Delay Cost, Logistics Cost, and Contractor Queue Cost. The $9,902 modeled avoided exposure versus the worst sequence is traceable to the avoidance of early placement of W3, yet this figure is independent of the $9,592 Structural Wait Exposure reported by the queue model. The unchanged Foundation Crew residual indicates that any future capacity action would need to address both contractors to affect total exposure.",
+    consistencyChecks: {"status": "PASS", "failed_count": 0, "checks": [{"check": "Mentions affected project", "ok": true, "expected": "W3"}, {"check": "Mentions affected contractor", "ok": true, "expected": "Drywall Subcontractor"}, {"check": "Mentions optimal sequence", "ok": true, "expected": "w5 → w4 → w6 → w1 → w2 → w3 → w7 → w8"}, {"check": "Does not invent non-portfolio projects", "ok": true, "expected": "Only W1–W8 allowed"}, {"check": "Does not use residual equipment terminology", "ok": true, "expected": "No equipment terminology"}, {"check": "Queue exposure language present when queue exists", "ok": true, "expected": "Queue exposure should be discussed"}, {"check": "Mentions or is compatible with total inefficiency cost", "ok": true, "expected": "$46,150"}]},
+    usage: {"prompt_tokens": 1355, "completion_tokens": 419, "total_tokens": 1774, "prompt_tokens_details": {"text_tokens": 1355, "audio_tokens": 0, "image_tokens": 0, "cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 0, "audio_tokens": 0, "accepted_prediction_tokens": 0, "rejected_prediction_tokens": 0}, "num_sources_used": 0, "cost_in_usd_ticks": 23380500},
+    precomputedAI: {
+      executive: "The Project Card mutation concentrated Drywall Subcontractor work on W3 and W4 while shifting their availability windows later in the calendar. Stochastic sequence optimization responded by placing both cards after W5 and W6, producing an optimal sequence whose total inefficiency cost of $46,150 is only $600 above the unmutated baseline. Queue Theory independently identifies the same Drywall Subcontractor as the primary bottleneck at 100 % utilization and an 11-day expected wait, generating $9,592 in structural wait exposure. The two models converge on the same contractor yet diverge in cost framing: the sequence model registers the exposure as Contractor Queue Cost ($15,027) within the inefficiency total, while the queue model isolates it as Structural Wait Exposure. The residual constraint listed for Foundation Crew ($5,435) is not altered by the sequence reordering, indicating that the mutation-induced contention on Drywall does not relieve pressure on the secondary resource.",
+      ceo: "Maintain the computed optimal sequence W5 → W4 → W6 → W1 → W2 → W3 → W7 → W8 as the current execution baseline; no further sequencing change is indicated by the supplied outputs.",
+      ora: "The interaction between models shows that the 15 % modeled improvement ($8,325) arises principally from repositioning W3 and W4 after higher-value upstream work, thereby reducing the nonlinear phase-value penalty embedded in Polynomial Delay Cost. However, the 11-day Drywall queue persists across both the optimal and alternative sequences, suggesting that sequence optimization alone does not relax the capacity constraint. Portfolio-wide Inefficiency Exposure remains $46,150 after ORA recovery, consistent with the sum of Polynomial Delay Cost, Logistics Cost, and Contractor Queue Cost. The $9,902 modeled avoided exposure versus the worst sequence is traceable to the avoidance of early placement of W3, yet this figure is independent of the $9,592 Structural Wait Exposure reported by the queue model. The unchanged Foundation Crew residual indicates that any future capacity action would need to address both contractors to affect total exposure."
+    }
+  },
+  {
+    id: "S-2026-043443",
+    seed: "1783487188280-43443",
+    generatedAt: "2026-07-08T05:06:36.050Z",
+    workerUrl: "https://generic-llm-proxy.omar-ora.workers.dev",
+    promptSentToAi: "===========================================================\nEXECUTIVE SCENARIO SUMMARY — SUPERSCRIPT v26\n===========================================================\n\nCASE\nAI Construction Portfolio Scenario Simulator\n\nEmployer\nW Rondon Construction LLC\n\nScenario ID\nS-2026-043443\n\nIrreversible Seed\n1783487188280-43443\n\n===========================================================\nSEED AUDIT — PROJECT CARD ONLY\n===========================================================\n\nSeed Rule\nThe seed modifies a multi-card Project Card package only. Project square footage remains fixed. Global matrices remain at default.\n\nProject Card affected\nW4\n\nFields changed\n- W4 trade/construction phase: MEP Rough-in → Site Work\n- W4 availability day: 2 → 15\n- W4 base duration (days): 9 → 16\n- W4 ORA risk buffer (days): 2 → 4\n- W2 trade/construction phase: Framing → Site Work\n- W2 availability day: 2 → 13\n- W2 base duration (days): 10 → 14\n- W2 ORA risk buffer (days): 2 → 5\n- W7 availability day: 1 → 9\n\nAffected contractor\nSite Crew\n\nExplanation\nSeed generated a multi-card contractor scenario package. Primary affected card: W4. Secondary contractor-contention card: W2. Changes: W4 trade/construction phase: MEP Rough-in → Site Work; W4 availability day: 2 → 15; W4 base duration (days): 9 → 16; W4 ORA risk buffer (days): 2 → 4; W2 trade/construction phase: Framing → Site Work; W2 availability day: 2 → 13; W2 base duration (days): 10 → 14; W2 ORA risk buffer (days): 2 → 5; W7 availability day: 1 → 9. Global cost, reliability, pause-day, and logistics matrices remain unchanged.\n\n===========================================================\nSTOCHASTIC SEQUENCE OPTIMIZATION OUTPUT\n===========================================================\n\nOptimization iterations\n5000\n\nEvaluated sequences\n4699\n\nOptimal sequence\nW5 → W7 → W4 → W3 → W6 → W2 → W1 → W8\n\nAlternative sequence\nW5 → W7 → W4 → W6 → W3 → W1 → W2 → W8\n\nWorst sequence encountered\nW4 → W8 → W5 → W1 → W6 → W3 → W7 → W2\n\nPolynomial Delay Cost\n$20,159\n\nLogistics Cost\n$763\n\nContractor Queue Cost\n$14,937\n\nTotal Inefficiency Cost\n$35,859\n\nBaseline Total Cost (unmutated Project Cards, for reference only)\n$45,550\n\nModeled avoided exposure versus worst sequence encountered\n$13,661\n\nSequence Cost Formula Boundary\nDelay Cost is not invented by AI or the contingency. It is computed by the stochastic sequence optimization engine as fixed daily overhead plus nonlinear phase-value penalty:\nfixed overhead + daily phase value × (wait day / 10)^2, capped at 10 wait days.\n\n===========================================================\nCONTRACTOR QUEUE OUTPUT\n===========================================================\n\nQueue Rule\nQueue is contractor-based and date-aware. It does not generate a separate scenario.\n\nPrimary contractor bottleneck\nFoundation Crew\n\nSecondary contractor bottleneck\nSite Crew\n\nUtilization indicator\n100%\n\nExpected wait\n7 days\n\nStructural wait exposure\n$8,120\n\nCapacity action boundary\nReview backup capacity for Foundation Crew\n\nResidual constraint\nSite Crew\n\nQueue exposure\n- W8 · Foundation Crew | Contractor: Foundation Crew | Expected wait: 7.0 days | Exposure: $8,120\n- W4 · Site Crew | Contractor: Site Crew | Expected wait: 17.0 days | Exposure: $6,817\n\n===========================================================\nPORTFOLIO IMPACT\n===========================================================\n\nWithout ORA\nPortfolio-wide scenario exposure: $43,971\n\nWith ORA\nResidual modeled exposure after calculated recovery: $35,859\n\nModeled Avoidable Exposure\n$8,112\n\nModeled Improvement\n18%\n\nProject shifts / affected sequence\n- W5: +4 position/day indicator versus baseline\n- W7: +5 position/day indicator versus baseline\n- W4: +1 position/day indicator versus baseline\n- W3: +1 position/day indicator versus baseline\n- W6: +1 position/day indicator versus baseline\n- W2: +4 position/day indicator versus baseline\n- W1: +6 position/day indicator versus baseline\n- W8: +0 position/day indicator versus baseline\n\nAffected projects\nW4, W1, W8, W5\n\n===========================================================\nTASK\n===========================================================\n\nInterpret only the deterministic findings above.\nExplain how Project Card mutation, stochastic sequence optimization, and contractor Queue exposure interact.\nDo not invent mitigation actions.\nDo not treat modeled avoided exposure as realized savings.\nDo not say equipment unless the data explicitly says equipment.\nProduce ONLY:\n\nExecutive Interpretation\n\nCEO Strategic Decision\n\nORA Analytical Assessment.",
+    rawAiResponse: "Executive Interpretation\nThe Project Card mutations shift W4 and W2 into the Site Work phase with later availability and extended durations, while also delaying W7. When these mutated cards are sequenced through the stochastic optimization model, the optimal order places W4 after W7 and before W3, W6, and W2, indicating that the sequence engine treats the Site Crew contention as a downstream constraint rather than an early blocker. The Queue model independently identifies Site Crew as the secondary bottleneck with a 17-day expected wait on W4 and a $6,817 exposure, while Foundation Crew remains the primary bottleneck at 7 days and $8,120 exposure. The interaction appears in the Total Inefficiency Cost of $35,859, which is lower than the unmutated baseline of $45,550 yet still contains the full Contractor Queue Cost of $14,937. This suggests that the sequence optimization reduces polynomial delay and logistics components but cannot eliminate the structural wait exposure generated by the contractor-level capacity constraints. The 18% modeled improvement and $8,112 modeled avoidable exposure are consistent with the difference between the worst sequence encountered and the optimal sequence, yet the residual $35,859 exposure indicates that queue-induced waits on both Foundation Crew and Site Crew remain binding after sequencing.\n\nCEO Strategic Decision\nThe findings indicate that the mutated Project Cards create a contractor contention pattern that the optimal sequence partially mitigates but does not remove. The CEO may consider whether the current contractor capacity allocation for Foundation Crew and Site Crew is aligned with the projected workload under the revised W4 and W2 parameters.\n\nORA Analytical Assessment\nThe stochastic sequence optimization and contractor queue outputs converge on the same residual constraint: Site Crew availability after the W4 mutation. The optimal sequence positions W4 later than W7, which is consistent with the 17-day expected wait reported by the queue model for W4. The $14,937 Contractor Queue Cost constitutes 42% of the $35,859 Total Inefficiency Cost, reinforcing that queue exposure is the dominant component once sequencing has minimized delay and logistics costs. The Portfolio Impact section shows that W4, W1, W8, and W5 experience position/day shifts, yet W8 remains at +0, which aligns with its identification as the primary queue exposure item under Foundation Crew. The Structural Wait Exposure of $8,120 and the Site Crew queue exposure of $6,817 are treated as independent metrics; their sum is not subtracted from or added to the sequence cost, supporting the interpretation that these represent separate capacity constraints that persist after sequence optimization.",
+    consistencyChecks: {"status": "PASS", "failed_count": 0, "checks": [{"check": "Mentions affected project", "ok": true, "expected": "W4"}, {"check": "Mentions affected contractor", "ok": true, "expected": "Site Crew"}, {"check": "Mentions optimal sequence", "ok": true, "expected": "w5 → w7 → w4 → w3 → w6 → w2 → w1 → w8"}, {"check": "Does not invent non-portfolio projects", "ok": true, "expected": "Only W1–W8 allowed"}, {"check": "Does not use residual equipment terminology", "ok": true, "expected": "No equipment terminology"}, {"check": "Queue exposure language present when queue exists", "ok": true, "expected": "Queue exposure should be discussed"}, {"check": "Mentions or is compatible with total inefficiency cost", "ok": true, "expected": "$35,859"}]},
+    usage: {"prompt_tokens": 1368, "completion_tokens": 517, "total_tokens": 1885, "prompt_tokens_details": {"text_tokens": 1368, "audio_tokens": 0, "image_tokens": 0, "cached_tokens": 64}, "completion_tokens_details": {"reasoning_tokens": 0, "audio_tokens": 0, "accepted_prediction_tokens": 0, "rejected_prediction_tokens": 0}, "num_sources_used": 0, "cost_in_usd_ticks": 29353000},
+    precomputedAI: {
+      executive: "The Project Card mutations shift W4 and W2 into the Site Work phase with later availability and extended durations, while also delaying W7. When these mutated cards are sequenced through the stochastic optimization model, the optimal order places W4 after W7 and before W3, W6, and W2, indicating that the sequence engine treats the Site Crew contention as a downstream constraint rather than an early blocker. The Queue model independently identifies Site Crew as the secondary bottleneck with a 17-day expected wait on W4 and a $6,817 exposure, while Foundation Crew remains the primary bottleneck at 7 days and $8,120 exposure. The interaction appears in the Total Inefficiency Cost of $35,859, which is lower than the unmutated baseline of $45,550 yet still contains the full Contractor Queue Cost of $14,937. This suggests that the sequence optimization reduces polynomial delay and logistics components but cannot eliminate the structural wait exposure generated by the contractor-level capacity constraints. The 18% modeled improvement and $8,112 modeled avoidable exposure are consistent with the difference between the worst sequence encountered and the optimal sequence, yet the residual $35,859 exposure indicates that queue-induced waits on both Foundation Crew and Site Crew remain binding after sequencing.",
+      ceo: "The findings indicate that the mutated Project Cards create a contractor contention pattern that the optimal sequence partially mitigates but does not remove. The CEO may consider whether the current contractor capacity allocation for Foundation Crew and Site Crew is aligned with the projected workload under the revised W4 and W2 parameters.",
+      ora: "The stochastic sequence optimization and contractor queue outputs converge on the same residual constraint: Site Crew availability after the W4 mutation. The optimal sequence positions W4 later than W7, which is consistent with the 17-day expected wait reported by the queue model for W4. The $14,937 Contractor Queue Cost constitutes 42% of the $35,859 Total Inefficiency Cost, reinforcing that queue exposure is the dominant component once sequencing has minimized delay and logistics costs. The Portfolio Impact section shows that W4, W1, W8, and W5 experience position/day shifts, yet W8 remains at +0, which aligns with its identification as the primary queue exposure item under Foundation Crew. The Structural Wait Exposure of $8,120 and the Site Crew queue exposure of $6,817 are treated as independent metrics; their sum is not subtracted from or added to the sequence cost, supporting the interpretation that these represent separate capacity constraints that persist after sequence optimization."
+    }
+  }
+];
+
+// Built once the engine (v14* functions/consts) is available further down
+// this script (function declarations are hoisted; this is only CALLED after
+// that point, at the bottom of the script).
+function buildInitialScenarios(){
+  return V14_INITIAL_SEED_CONFIG.map((entry) => {
+    const seedResult = v14GenerateProjectCardMutation(entry.seed);
+    const mcts = v14RunMcts(seedResult.projects, entry.seed);
+    // FIX (replaces the old S-2026-0${16+idx} scheme): these 4 baseline
+    // records now carry the exact scenario_id that was assigned when they
+    // were generated live (once, offline, before publishing), instead of an
+    // arbitrary 016-019 counter unrelated to the actual seed.
+    const s = { id: entry.id, seed: entry.seed, status: "AI Ready" };
+    v14ApplyToScenario(s, entry.seed, seedResult.projects, seedResult.mutation, mcts);
+    s.aiSections = {
+      executive: entry.precomputedAI.executive,
+      ceo: entry.precomputedAI.ceo,
+      ora: entry.precomputedAI.ora
+    };
+    // FIX: this is now the real, verified audit trail from the actual
+    // offline Worker call (prompt sent, raw response, consistency checks,
+    // usage) instead of null placeholders. Anyone downloading the AI Audit
+    // Log for one of these 4 baseline records gets the genuine record, not
+    // an empty shell.
+    s.aiExchange = {
+      generated_at: entry.generatedAt,
+      worker_url: entry.workerUrl,
+      scenario: null,
+      executive_scenario_summary: entry.promptSentToAi,
+      raw_worker_response: null,
+      raw_content: entry.rawAiResponse,
+      parsed_sections: {
+        executive_interpretation: entry.precomputedAI.executive,
+        ceo_strategic_decision: entry.precomputedAI.ceo,
+        ora_analytical_assessment: entry.precomputedAI.ora
+      },
+      consistency_checks: entry.consistencyChecks,
+      usage: entry.usage
+    };
+    return s;
+  });
+}
+
+const generatedScenarios = [
+  {
+    id:"S-2026-020", seed:"84912", title:"Foundation Crew unavailable during foundation work", summary:"Foundation Crew unavailable at W1 for 3 working days",
+    project:"W1 · Foundation", resource:"Foundation Crew", window:"Day 4–6", type:"Availability failure", cost:"+$4,180", projects:"3", avoidable:"$2,940", status:"Not Run",
+    narrative:[
+      "<strong>The contractor availability failure changes the planned assignment sequence during W1 foundation work and exposes follow-on work to a queue condition.</strong> The disruption is evaluated across the portfolio because this shared contractor capacity affects more than the directly impacted project.",
+      "<div class='response-section'>Portfolio effect</div>The integrated results identify three affected projects and incremental portfolio cost of $4,180. The sequence engine recalculates the contractor sequence and Queue Theory tests the waiting condition created by the unavailable excavator window.",
+      "<div class='response-section'>Calculated alternatives</div>The recovery option modeled is temporary capacity or an alternate revised route. Its verified cost must remain below the estimated avoidable portfolio exposure of $2,940.",
+      "<div class='response-section'>Decision boundary</div>The scenario is controlled and must not be treated as a confirmed field condition until availability, site readiness, and contractor rate are verified."
+    ],
+    ceo:"Authorize temporary capacity only if the verified cost stays below the calculated avoidable exposure. Preserve the highest-priority foundation work window and require a refreshed model result if conditions differ from the simulated three-day interruption.",
+    ora:"Confirm site readiness, contractor availability, rate, and revised work windows before authorization. Validate the disrupted contractor sequence against current project dependencies and rerun the simulation when necessary."
+  },
+  {
+    id:"S-2026-021", seed:"60845", title:"Interior Crew capacity reduced during roofing activity", summary:"Interior Crew capacity reduced at W5",
+    project:"W5 · Roofing", resource:"Interior Crew", window:"Day 5–7", type:"Capacity reduction", cost:"+$2,760", projects:"2", avoidable:"$1,850", status:"Not Run",
+    narrative:[
+      "<strong>The Interior Crew capacity reduction generates a shared-resource queue during the W5 roofing work window.</strong> The model evaluates whether the resulting conflict can be absorbed through sequencing or whether temporary capacity provides a lower-cost recovery path.",
+      "<div class='response-section'>Portfolio effect</div>Two projects are affected in the calculated scenario, producing incremental portfolio cost of $2,760. The queue analysis shows the impact of constrained contractor availability on the active work windows.",
+      "<div class='response-section'>Calculated alternatives</div>Temporary capacity and revised sequencing are compared against the avoidable exposure of $1,850. The selected recovery must be supported by verified availability and a rate that produces net avoidance.",
+      "<div class='response-section'>Decision boundary</div>Actual resource condition and roofing task readiness must be confirmed before execution."
+    ],
+    ceo:"Approve rental only after reviewing net savings against the calculated recovery cost. Do not authorize capacity merely to restore the original allocation if the revised sequence provides lower verified exposure.",
+    ora:"Validate roofing work readiness, shortage duration, and any downstream contractor conflict. Recalculate if the capacity reduction extends outside the modeled Day 5–7 window."
+  },
+  {
+    id:"S-2026-022", seed:"41709", title:"Material availability delays plumbing work at W4", summary:"Material readiness delay at W4 plumbing systems",
+    project:"W4 · Plumbing Systems", resource:"Material readiness", window:"Day 4–5", type:"Start availability delay", cost:"+$2,590", projects:"2", avoidable:"$1,670", status:"Not Run",
+    narrative:[
+      "<strong>The delayed material readiness shifts the planned W4 plumbing work window and increases the probability of overlap with shared resources.</strong> The event is evaluated as a portfolio condition because displacement of W4 work can transfer waiting exposure to later scheduled activities.",
+      "<div class='response-section'>Portfolio effect</div>The integrated scenario identifies two affected projects and incremental cost of $2,590. The sequence engine recalculates the operating sequence under the new W4 availability date, while Queue Theory measures the conflict created by the shifted work window.",
+      "<div class='response-section'>Calculated alternatives</div>The model compares retaining the current sequence with a revised operating order. Any corrective spending must be evaluated against the avoidable exposure of $1,670 and confirmed material delivery timing.",
+      "<div class='response-section'>Decision boundary</div>The narrative is derived from the loaded simulated contingency and must not be treated as a confirmed field condition until delivery, readiness, and resource availability are verified."
+    ],
+    ceo:"Authorize corrective spending only after the integrated scenario confirms the avoided-cost threshold. Require a revised result where supplier timing or actual project readiness differs from the modeled delay.",
+    ora:"Confirm material delivery timing, W4 project readiness, and resulting resource impacts before execution. Rerun the scenario if the actual delay exceeds the controlled Day 4–5 window."
+  }
+];
+
+let scenarios = []; // populated by buildInitialScenarios() once the engine loads (see bottom of script)
+let selectedId = null;
+let generatedIndex = 0;
+const el = id => document.getElementById(id);
+
+
+function htmlNarrative(parts){ return parts.map(part => `<p>${part}</p>`).join(""); }
+
+// All scenarios (precomputed and generated) now carry a real dynamicProfile
+// built from the actual engine output (v14BuildProfile). There is no more
+// static/fallback chart data — every chart reflects the specific scenario.
+function chartProfileForScenario(s){
+  return (s && s.dynamicProfile) || {direct:"", affected:[], shifts:{}, queues:[], hasQueueConflict:false, directContractor:""};
+}
+
+function renderScenarioCharts(s){
+  const profile = chartProfileForScenario(s);
+  const sequenceHost = el("sequenceDeltaChart");
+  const queueHost = el("queueExposureChart");
+  if(!sequenceHost || !queueHost) return;
+
+  const projects = ["W1","W2","W3","W4","W5","W6","W7","W8"];
+  sequenceHost.innerHTML = projects.map((project, index) => {
+    const baselineStart = Math.min(78, 4 + index * 8);
+    const duration = project === profile.direct ? 20 : 16;
+    const shift = profile.shifts[project] || 0;
+    const scenarioStart = Math.min(83, baselineStart + shift * 5);
+    const recoveryStart = Math.min(83, baselineStart + Math.max(0, shift - 1) * 5);
+    const affected = profile.affected.includes(project);
+    const deltaDays = Math.max(0, shift);
+    const deltaLabel = deltaDays > 0 ? `+${deltaDays}d` : "—";
+    return `
+      <div class="sequence-row">
+        <div class="sequence-label">${project}${affected ? " · Δ" : ""}</div>
+        <div class="sequence-track">
+          <span class="seq-bar base" style="left:${baselineStart}%;width:${duration}%"></span>
+          <span class="seq-bar scenario" style="left:${scenarioStart}%;width:${duration}%"></span>
+          <span class="seq-bar recovery" style="left:${recoveryStart}%;width:${duration}%"></span>
+        </div>
+        <div class="sequence-delta${deltaDays > 0 ? " shifted" : ""}">${deltaLabel}</div>
+      </div>`;
+  }).join("");
+
+  if(profile.hasQueueConflict && profile.queues.length){
+    // CASE A: at least one contractor has measurable structural wait exposure.
+    // Scale is computed from the contractors actually shown across the current
+    // session's saved scenarios, so severity stays comparable without relying
+    // on any hardcoded/static reference table.
+    const allQueues = scenarios.flatMap(sc => (chartProfileForScenario(sc).queues || []));
+    const globalMaxWait = allQueues.length ? Math.max(...allQueues.map(row => row[2])) : 1;
+
+    queueHost.innerHTML = profile.queues.map(([name, resource, days, cost]) => `
+      <div class="queue-item">
+        <div>
+          <div class="queue-name">${name}</div>
+          <div class="queue-meta">${resource}</div>
+        </div>
+        <div class="queue-bar"><div class="queue-fill" style="width:${Math.round((days / globalMaxWait) * 100)}%"></div></div>
+        <div class="queue-value">${days.toFixed(1)}d · ${cost}</div>
+      </div>`).join("");
+  } else {
+    // CASE B: no contractor shows measurable structural wait exposure for
+    // this scenario. Show a clear positive state instead of a list of
+    // zero-value rows that would otherwise repeat identically across scenarios.
+    queueHost.innerHTML = `
+      <div class="queue-empty">
+        <div class="queue-empty-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div>
+          <div class="queue-empty-title">No structural queue conflict detected</div>
+          <div class="queue-empty-sub">${escapeHtml(profile.directContractor || "The affected contractor")} had no overlapping demand from other active projects in this scenario.</div>
+        </div>
+      </div>`;
+  }
+
+  el("sequenceDeltaNote").textContent =
+    `${profile.direct} is the direct disruption point. Red bars show the scenario window; green bars show the calculated recovery window. Right-hand values show the shift versus baseline.`;
+  el("queueExposureNote").textContent = profile.hasQueueConflict && profile.queues.length
+    ? `Only contractors with measurable structural wait exposure are shown, ordered from highest to lowest so severity is comparable across scenarios.`
+    : `No contractor showed measurable structural wait exposure for this scenario.`;
+}
+
+function parseMoney(str){
+  const n = parseFloat(String(str).replace(/[^0-9.]/g,""));
+  return isNaN(n) ? 0 : n;
+}
+
+function renderOraImpact(s){
+  const without = parseMoney(s.cost);
+  const avoidable = parseMoney(s.avoidable);
+  const withOra = Math.max(0, without - avoidable);
+  const pct = without > 0 ? Math.round((avoidable / without) * 100) : 0;
+  el("oraWithoutValue").textContent = `$${without.toLocaleString("en-US")}`;
+  el("oraWithValue").textContent = `$${withOra.toLocaleString("en-US")}`;
+  el("oraSavingsPct").textContent = `${pct}%`;
+  el("oraImpactRisk").textContent =
+    `Savings reflect the modeled recovery for "${s.title}" only; execution remains subject to verified field inputs and management authorization.`;
+}
+
+function renderDynamicQueueStatus(s){
+  const q = s.queueOutput || {};
+  const exposure = Number(q.structuralWaitExposure || 0);
+  const hasQueue = exposure > 0;
+  const title = el("queueActionTitle");
+  const copy = el("queueActionCopy");
+  const pill = el("queueActionPill");
+  const panel = el("structuralExposurePanel");
+
+  if(title){
+    title.textContent = hasQueue ? "Contractor queue exposure detected" : "No material contractor queue exposure";
+  }
+  if(copy){
+    copy.textContent = hasQueue
+      ? `${q.primaryBottleneck || "Contractor"} creates ${Number(q.expectedWaitDays || 0).toFixed(1)} expected wait days and $${exposure.toLocaleString("en-US")} structural exposure.`
+      : "No contractor generated measurable structural wait exposure under the selected sequence.";
+  }
+  if(pill){
+    pill.textContent = hasQueue ? "QUEUE" : "CLEAR";
+    pill.className = "pill " + (hasQueue ? "pill-red" : "pill-green");
+  }
+
+  if(panel){
+    if(hasQueue){
+      const baseline = Math.max(1, Number((s.withoutOraSequenceResult && s.withoutOraSequenceResult.contractorQueueCost) || 0));
+      const scenario = Math.max(0, Number((s.mctsOutput && s.mctsOutput.contractorQueueCost) || exposure));
+      const recovery = Math.max(0, Math.round(scenario * 0.65));
+      const maxVal = Math.max(1, baseline, scenario, recovery);
+      panel.innerHTML = `
+        <div class="barrow"><label>Original</label><div class="track"><div class="fill base" style="width:${Math.max(4, Math.round(baseline/maxVal*100))}%"></div></div><div class="cost">$${baseline.toLocaleString("en-US")}</div></div>
+        <div class="barrow"><label>Optimized</label><div class="track"><div class="fill current" style="width:${Math.max(4, Math.round(scenario/maxVal*100))}%"></div></div><div class="cost">$${scenario.toLocaleString("en-US")}</div></div>
+        <div class="barrow"><label>Recovery</label><div class="track"><div class="fill recovery" style="width:${Math.max(4, Math.round(recovery/maxVal*100))}%"></div></div><div class="cost">$${recovery.toLocaleString("en-US")}</div></div>
+        <div class="footerhint">Contractor queue exposure is calculated from date-aware demand windows.</div>`;
+    }else{
+      panel.innerHTML = `
+        <div class="structural-empty">
+          <div class="structural-empty-icon">✓</div>
+          <div>
+            <div class="structural-empty-title">No structural wait-cost exposure</div>
+            <div>The contractor Queue layer evaluated date-aware demand windows and found no measurable queue penalty for this scenario.</div>
+          </div>
+        </div>`;
+    }
+  }
+}
+
+function resetResponseScrolls(){
+  const panels = ["narrative","ceoAction","oraAction"];
+  panels.forEach(id => {
+    const panel = el(id);
+    if(panel) panel.scrollTop = 0;
+  });
+  requestAnimationFrame(() => panels.forEach(id => {
+    const panel = el(id);
+    if(panel) panel.scrollTop = 0;
+  }));
+}
+
+function loadScenario(s){
+  el("contTitle").textContent=s.title; el("seedBadge").textContent=`${s.id} · Seed ${s.seed}`;
+  el("directProject").textContent=s.project; el("affectedResource").textContent=s.resource;
+  el("window").textContent=s.window; el("eventType").textContent=s.type;
+  el("metricCost").textContent=s.cost; el("metricProjects").textContent=s.projects; el("metricAvoidable").textContent=s.avoidable;
+  el("sequenceStatusPill").textContent = s.sequenceStatus || "CHANGED";
+  el("sequenceStatusNote").textContent = s.sequenceStatusNote || "Sequence engine recalculated route.";
+
+  // If this record already contains an AI response, restore it from the record.
+  // RUN must not call the Worker; it only republishes the saved contingency and its saved AI output.
+  if(s.aiSections){
+    el("narrative").innerHTML = textToParagraphHtml(s.aiSections.executive);
+    el("ceoAction").textContent = s.aiSections.ceo || "No saved CEO Strategic Decision.";
+    el("oraAction").textContent = s.aiSections.ora || "No saved ORA Analytical Assessment.";
+    lastOraExchange = s.aiExchange || null;
+  }else{
+    el("narrative").innerHTML=htmlNarrative(s.narrative);
+    el("ceoAction").textContent=s.ceo;
+    el("oraAction").textContent=s.ora;
+    lastOraExchange = null;
+  }
+
+  renderOraImpact(s);
+  renderDynamicQueueStatus(s);
+  resetResponseScrolls();
+  renderScenarioCharts(s);
+}
+
+function renderRecords(){
+  const host=el("recordsList");host.innerHTML="";
+  if(!scenarios.length){
+    host.innerHTML='<div class="empty">No saved contingency records remain. Generate a new contingency to create a record.</div>';
+  } else {
+    scenarios.forEach(s=>{
+      const isSelected = selectedId === s.id;
+      const row=document.createElement("div");
+      row.className="record-row"+(isSelected?" selected":"");
+      row.setAttribute("role","button");
+      row.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      row.setAttribute("aria-label", `Select ${s.id}`);
+      row.innerHTML=`
+        <div class="record-id-badge">${s.id}</div>
+        <div><div class="record-summary">${s.summary}</div><div class="record-meta">Seed ${s.seed} · ${s.type} · ${s.project}</div></div>
+        <div class="status ${(s.status==="Last Run" || s.status==="AI Ready")?"run":"idle"}">${s.status}</div>
+        <button type="button" class="run-btn" ${(isSelected && !isOraRunning) ? "" : "disabled"}>RUN</button>
+        <button type="button" class="clear-btn" ${isSelected ? "" : "disabled"}>CLEAR</button>`;
+
+      // Clicking anywhere on the row toggles selection; clicks on the
+      // RUN/CLEAR buttons themselves are handled separately and don't
+      // re-trigger the row toggle.
+      row.addEventListener("click",(evt)=>{
+        if(evt.target.closest("button")) return;
+        selectedId = isSelected ? null : s.id;
+        renderRecords();
+      });
+
+      const runButton = row.querySelector(".run-btn");
+      const clearButton = row.querySelector(".clear-btn");
+
+      runButton.addEventListener("click",(evt)=>{
+        evt.stopPropagation();
+        if(selectedId !== s.id) return;
+        runScenario(s);
+      });
+
+      clearButton.addEventListener("click",(evt)=>{
+        evt.stopPropagation();
+        if(selectedId !== s.id) return;
+        clearScenario(s.id);
+      });
+
+      host.appendChild(row);
+    });
+  }
+  el("recordCount").textContent=`${scenarios.length} RECORD${scenarios.length===1?"":"S"}`;
+}
+
+const ORA_WORKER_URL = "https://generic-llm-proxy.omar-ora.workers.dev";
+let isOraRunning = false;
+let lastOraExchange = null;
+let aiProcessTimer = null;
+let oraCallSource = null;
+let lastGenerateClickAt = 0;
+
+function stopAIProcessingMessages(){
+  if(aiProcessTimer){
+    clearInterval(aiProcessTimer);
+    aiProcessTimer = null;
+  }
+}
+
+function renderAIProcessingStep(step=0){
+  const narrative = el("narrative");
+  const ceo = el("ceoAction");
+  const ora = el("oraAction");
+
+  const executiveSteps = [
+    "Building Executive Scenario Summary...",
+    "Validating deterministic scenario outputs...",
+    "Analyzing sequence optimization results...",
+    "Analyzing Queue Theory capacity exposure...",
+    "Sending request to ORA Worker...",
+    "Waiting for Worker-injected ORA assessment..."
+  ];
+
+  const ceoSteps = [
+    "Evaluating executive decision boundary...",
+    "Ranking operational priorities...",
+    "Preparing CEO recommendation...",
+    "Checking action against modeled exposure..."
+  ];
+
+  const oraSteps = [
+    "Checking model interaction...",
+    "Validating convergence and dependency...",
+    "Assessing robustness and residual constraints...",
+    "Preparing ORA analytical assessment..."
+  ];
+
+  const safeStep = Math.max(0, step);
+
+  if(narrative){
+    narrative.innerHTML = `
+      <div class="ai-process">
+        ${executiveSteps.slice(0, Math.min(executiveSteps.length, safeStep + 1))
+          .map(item => `<span class="phase">${item}</span>`).join("")}
+      </div>`;
+  }
+
+  if(ceo){
+    ceo.innerHTML = `<div class="ai-process">
+      <span class="phase">${ceoSteps[safeStep % ceoSteps.length]}</span>
+    </div>`;
+  }
+
+  if(ora){
+    ora.innerHTML = `<div class="ai-process">
+      <span class="phase">${oraSteps[safeStep % oraSteps.length]}</span>
+    </div>`;
+  }
+
+  resetResponseScrolls();
+}
+
+function setAIProcessingPlaceholders(){
+  stopAIProcessingMessages();
+  let step = 0;
+  renderAIProcessingStep(step);
+  aiProcessTimer = setInterval(() => {
+    step += 1;
+    renderAIProcessingStep(step);
+  }, 650);
+}
+
+function setAIResponding(){
+  stopAIProcessingMessages();
+  el("aiState").textContent="RESPONDING";
+  el("streamingText").textContent="Sending Executive Scenario Summary to ORA Worker";
+  el("dots").classList.remove("hidden");
+  const jsonBtn = el("aiJsonBtn");
+  if(jsonBtn) jsonBtn.classList.add("hidden");
+  lastOraExchange = null;
+  setAIProcessingPlaceholders();
+}
+
+function setAIReady(){
+  stopAIProcessingMessages();
+  el("aiState").textContent="RESPONSE READY";
+  el("streamingText").textContent="Assessment generated from Worker-injected ORA profile.";
+  el("dots").classList.add("hidden");
+  const jsonBtn = el("aiJsonBtn");
+  if(jsonBtn && lastOraExchange){
+    try{ prepareOraJsonDownloadLink(); }catch(error){ console.warn("JSON link preparation failed", error); }
+    jsonBtn.classList.remove("hidden");
+  }
+}
+
+function setAIError(message){
+  stopAIProcessingMessages();
+  el("aiState").textContent="WORKER ERROR";
+  el("streamingText").textContent=message || "The ORA Worker did not return a usable response.";
+  el("dots").classList.add("hidden");
+  const jsonBtn = el("aiJsonBtn");
+  if(jsonBtn && lastOraExchange){
+    try{ prepareOraJsonDownloadLink(); }catch(error){ console.warn("JSON link preparation failed", error); }
+    jsonBtn.classList.remove("hidden");
+  }
+}
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function textToParagraphHtml(value){
+  const clean = String(value || "").trim();
+  if(!clean) return "<p>No assessment returned.</p>";
+  return clean
+    .split(/\n\s*\n+/)
+    .map(part => `<p>${escapeHtml(part).replace(/\n/g,"<br>")}</p>`)
+    .join("");
+}
+
+function splitOraSections(rawText){
+  const text = String(rawText || "").replace(/\r/g,"").trim();
+  const labels = [
+    "Executive Interpretation",
+    "CEO Strategic Decision",
+    "ORA Analytical Assessment"
+  ];
+
+  const positions = labels.map(label => {
+    const pattern = new RegExp(`(?:^|\\n)\\s*(?:\\*\\*)?(?:\\d+\\.\\s*)?${label.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")}(?:\\*\\*)?\\s*:?\\s*(?:\\n|$)`, "i");
+    const match = text.match(pattern);
+    return match ? { label, index: match.index + (match[0].startsWith("\n") ? 1 : 0), length: match[0].trimStart().length } : null;
+  }).filter(Boolean).sort((a,b)=>a.index-b.index);
+
+  if(positions.length < 2){
+    return {
+      executive: text,
+      ceo: "The Worker response did not separate a CEO Strategic Decision section.",
+      ora: "The Worker response did not separate an ORA Analytical Assessment section."
+    };
+  }
+
+  const getBody = (label) => {
+    const current = positions.find(p => p.label === label);
+    if(!current) return "";
+    const currentOrderIndex = positions.findIndex(p => p.label === label);
+    const next = positions[currentOrderIndex + 1];
+    return text.slice(current.index + current.length, next ? next.index : text.length).trim();
+  };
+
+  return {
+    executive: getBody("Executive Interpretation"),
+    ceo: getBody("CEO Strategic Decision"),
+    ora: getBody("ORA Analytical Assessment")
+  };
+}
+
+function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+async function typeTextInto(element, text, options={}){
+  const speed = options.speed ?? 5;
+  const value = String(text || "").trim();
+  element.textContent = "";
+  for(let i=0;i<value.length;i++){
+    element.textContent += value[i];
+    if(i % 3 === 0) element.scrollTop = element.scrollHeight;
+    await sleep(speed);
+  }
+}
+
+
+function buildOraConsistencyChecks(s, sections){
+  const combined = [
+    sections?.executive || "",
+    sections?.ceo || "",
+    sections?.ora || ""
+  ].join("\n").toLowerCase();
+
+  const checks = [];
+  const add = (name, ok, expected) => checks.push({check:name, ok:Boolean(ok), expected});
+
+  const mutation = s?.seedAudit || {};
+  const mcts = s?.mctsOutput || {};
+  const queue = s?.queueOutput || {};
+
+  add("Mentions affected project", !mutation.projectId || combined.includes(String(mutation.projectId).toLowerCase()), mutation.projectId || "N/A");
+  add("Mentions affected contractor", !mutation.affectedContractor || combined.includes(String(mutation.affectedContractor).toLowerCase()), mutation.affectedContractor || "N/A");
+
+  if(mcts.optimalSequence && mcts.optimalSequence.length){
+    const seqA = mcts.optimalSequence.join(" → ").toLowerCase();
+    const seqB = mcts.optimalSequence.join(" -> ").toLowerCase();
+    add("Mentions optimal sequence", combined.includes(seqA) || combined.includes(seqB) || mcts.optimalSequence.every(x => combined.includes(x.toLowerCase())), seqA);
+    add("Does not invent non-portfolio projects", !/\bw(9|10|11|12)\b/i.test(combined), "Only W1–W8 allowed");
+  }
+
+  add("Does not use residual equipment terminology", !/(mini dumper|excavator|manlift|crew tool kit|equipment route|shared equipment)/i.test(combined), "No equipment terminology");
+
+  if(Number(queue.structuralWaitExposure || 0) > 0){
+    add("Queue exposure language present when queue exists", /queue|wait|structural/i.test(combined), "Queue exposure should be discussed");
+  }else{
+    add("No false positive queue exposure", !/structural wait exposure of \$[1-9]/i.test(combined), "No positive queue exposure when deterministic value is zero");
+  }
+
+  if(mcts.totalInefficiencyCost !== undefined){
+    const total = Number(mcts.totalInefficiencyCost || 0).toLocaleString("en-US").toLowerCase();
+    add("Mentions or is compatible with total inefficiency cost", combined.includes(total) || combined.includes("total inefficiency"), "$" + total);
+  }
+
+  const failed = checks.filter(c => !c.ok);
+  return {
+    status: failed.length ? "REVIEW_REQUIRED" : "PASS",
+    failed_count: failed.length,
+    checks
+  };
+}
+
+
+
+function buildScenarioSnapshotForJson(s){
+  if(!s) return null;
+  return {
+    id: s.id,
+    seed: s.seed,
+    title: s.title,
+    project: s.project,
+    resource: s.resource,
+    window: s.window,
+    type: s.type,
+    cost: s.cost,
+    projects: s.projects,
+    avoidable: s.avoidable,
+    sequenceStatus: s.sequenceStatus,
+    sequenceStatusNote: s.sequenceStatusNote,
+    seedAudit: s.seedAudit || null,
+    mctsOutput: s.mctsOutput ? {
+      iterations: s.mctsOutput.iterations,
+      evaluatedSequences: s.mctsOutput.evaluatedSequences,
+      optimalSequence: s.mctsOutput.optimalSequence,
+      alternativeSequence: s.mctsOutput.alternativeSequence,
+      worstSequence: s.mctsOutput.worstSequence,
+      delayCost: s.mctsOutput.delayCost,
+      logisticsCost: s.mctsOutput.logisticsCost,
+      contractorQueueCost: s.mctsOutput.contractorQueueCost,
+      totalInefficiencyCost: s.mctsOutput.totalInefficiencyCost,
+      baselineTotalCost: s.mctsOutput.baselineTotalCost,
+      modeledAvoidedExposure: s.mctsOutput.modeledAvoidedExposure,
+      deltaVsBaseline: s.mctsOutput.deltaVsBaseline,
+      topSequences: s.mctsOutput.topSequences
+    } : null,
+    queueOutput: s.queueOutput || null,
+    withoutOraSequenceResult: s.withoutOraSequenceResult ? {
+      sequence: s.withoutOraSequenceResult.sequence,
+      delayCost: s.withoutOraSequenceResult.delayCost,
+      logisticsCost: s.withoutOraSequenceResult.logisticsCost,
+      contractorQueueCost: s.withoutOraSequenceResult.contractorQueueCost,
+      totalInefficiencyCost: s.withoutOraSequenceResult.totalInefficiencyCost
+    } : null
+  };
+}
+
+function safeStringifyJson(value){
+  const seen = new WeakSet();
+  return JSON.stringify(value, (key, val) => {
+    if(typeof val === "object" && val !== null){
+      if(seen.has(val)) return "[Circular reference removed]";
+      seen.add(val);
+    }
+    return val;
+  }, 2);
+}
+
+
+async function applyOraResponse(rawText, exchangeMeta={}){
+  stopAIProcessingMessages();
+  const sections = splitOraSections(rawText);
+  lastOraExchange = {
+    generated_at: new Date().toISOString(),
+    worker_url: ORA_WORKER_URL,
+    scenario: buildScenarioSnapshotForJson(exchangeMeta.scenario || null),
+    executive_scenario_summary: exchangeMeta.summary || null,
+    raw_worker_response: exchangeMeta.workerData || null,
+    raw_content: rawText,
+    parsed_sections: {
+      executive_interpretation: sections.executive,
+      ceo_strategic_decision: sections.ceo,
+      ora_analytical_assessment: sections.ora
+    },
+    usage: exchangeMeta.workerData?.usage || null,
+    consistency_checks: buildOraConsistencyChecks(exchangeMeta.scenario || null, sections)
+  };
+
+  el("streamingText").textContent="Visualizing ORA response in executive panels";
+
+  el("narrative").textContent = "";
+  el("ceoAction").textContent = "";
+  el("oraAction").textContent = "";
+  resetResponseScrolls();
+
+  await typeTextInto(el("narrative"), sections.executive || "No Executive Interpretation returned.", {speed:4});
+  el("narrative").innerHTML = textToParagraphHtml(sections.executive);
+  await sleep(120);
+  await typeTextInto(el("ceoAction"), sections.ceo || "No CEO Strategic Decision returned.", {speed:4});
+  await sleep(120);
+  await typeTextInto(el("oraAction"), sections.ora || "No ORA Analytical Assessment returned.", {speed:4});
+
+  resetResponseScrolls();
+  return sections;
+}
+
+
+let currentOraJsonObjectUrl = null;
+
+function buildPublishedAiTextPayload(){
+  // FIX (audit-trail expansion, approved): the point of this download is to
+  // let Omar review, offline, exactly what was asked of the model and what it
+  // returned, so the prompt in buildExecutiveScenarioSummary() can be tuned
+  // if the output drifts. Everything below already exists in lastOraExchange
+  // (built in applyOraResponse()) — this payload now actually exports it
+  // instead of quietly dropping it.
+  const parsed = lastOraExchange?.parsed_sections || {};
+  return {
+    scenario_id: lastOraExchange?.scenario?.id || lastOraExchange?.scenario_id || null,
+    seed: lastOraExchange?.scenario?.seed || null,
+    generated_at: lastOraExchange?.generated_at || new Date().toISOString(),
+    worker_url: lastOraExchange?.worker_url || null,
+
+    // What was actually sent to the model. Without this, the response below
+    // cannot be evaluated for prompt tuning.
+    prompt_sent_to_ai: lastOraExchange?.executive_scenario_summary || null,
+
+    // What the model actually returned, before any section-splitting.
+    raw_ai_response: lastOraExchange?.raw_content || null,
+
+    // The three published sections, as shown on screen.
+    published_sections: {
+      executive_assessment: parsed.executive_interpretation || el("narrative")?.innerText || "",
+      action_for_ceo: parsed.ceo_strategic_decision || el("ceoAction")?.innerText || "",
+      verification_for_ora: parsed.ora_analytical_assessment || el("oraAction")?.innerText || ""
+    },
+
+    // Automated checks already computed by the engine (e.g. whether the AI
+    // text contradicts a deterministic value) — previously calculated but
+    // never exported for review.
+    consistency_checks: lastOraExchange?.consistency_checks || null,
+
+    // Token usage reported by the Worker, when available, for cost/response-
+    // length review during prompt tuning.
+    usage: lastOraExchange?.usage || null
+  };
+}
+
+function prepareOraJsonDownloadLink(){
+  const link = el("aiJsonBtn");
+  if(!link || !lastOraExchange) return;
+
+  if(currentOraJsonObjectUrl){
+    try{ URL.revokeObjectURL(currentOraJsonObjectUrl); }catch(e){}
+    currentOraJsonObjectUrl = null;
+  }
+
+  const scenarioId = lastOraExchange.scenario?.id || "scenario";
+  const timestamp = new Date().toISOString().replace(/[:.]/g,"-");
+  const filename = `AI_Audit_Log_${scenarioId}_${timestamp}.json`;
+  const payload = buildPublishedAiTextPayload();
+  const jsonText = JSON.stringify(payload, null, 2);
+  const blob = new Blob([jsonText], {type:"application/json;charset=utf-8"});
+  currentOraJsonObjectUrl = URL.createObjectURL(blob);
+
+  link.href = currentOraJsonObjectUrl;
+  link.download = filename;
+  link.target = "_self";
+  link.rel = "noopener";
+  link.dataset.filename = filename;
+  // FIX: this was never assigned before, so the Safari/blocked-download
+  // modal fallback (which reads link.dataset.jsonText) always showed empty.
+  link.dataset.jsonText = jsonText;
+}
+
+
+/* ============================================================
+   SUPERSCRIPT v26 — STOCHASTIC SEQUENCE OPTIMIZATION + CONTRACTOR QUEUE
+   ------------------------------------------------------------
+   Built from the validated v11 frontend/Worker shell.
+   Sequencing here is a stochastic search (original sequence + availability-
+   ordered sequence + thousands of random shuffles, keeping the lowest-cost
+   result) — NOT a tree-search/UCT algorithm. The real MCTS with UCT and
+   backpropagation lives in the separate, verified MCTS_WRondon_8proj_MCTS_FINAL.html
+   script; this engine is intentionally simpler and is labeled accordingly
+   throughout the UI and AI-facing text.
+   - 24 construction phases/trades
+   - Project Card fields only are modified by seed
+   - Daily phase value = square footage × trade cost / base duration
+   - Delay penalty = fixed overhead + phase value × (wait_day / 10)^2
+   - Delay penalty capped at 10 wait days, then replacement condition
+   - 5,000 sequence iterations
+   Queue layer is contractor-based and date-aware.
+   ============================================================ */
+
+const V14_ITERATIONS = 5000;
+const V14_FIXED_OVERHEAD_PER_DAY = 66.67;
+const V14_DELAY_NORMALIZATION_DAYS = 10;
+
+const V14_TRADE_COSTS = {
+  "Survey Services": 0.45,
+  "Plans": 0.70,
+  "Permits": 0.35,
+  "Site Work": 2.10,
+  "Water & Sewer Line": 1.85,
+  "Footers Materials": 2.25,
+  "Footers Labor": 2.60,
+  "Concrete Pump": 0.55,
+  "Foundation Materials": 3.10,
+  "Foundation Labor": 3.40,
+  "Concrete Slab Materials": 2.75,
+  "Concrete Slab Labor": 2.95,
+  "Wall Framing 1F Materials": 4.25,
+  "Floor System 2F Materials": 3.80,
+  "Wall Framing 2F Materials": 4.15,
+  "Floor System 3F Materials": 3.75,
+  "Wall Framing 3F Materials": 4.10,
+  "Roof System Framing Materials": 3.95,
+  "Fire Wall Framing Materials": 2.90,
+  "Framing-Trusses": 4.80,
+  "Framing Hardware": 1.20,
+  "Framing Labor": 6.25,
+  "Roofing": 5.40,
+  "Windows": 4.95,
+  "Exterior Doors": 2.20,
+  "Plumbing Labor": 5.10,
+  "Electrical Labor": 5.35,
+  "HVAC System": 5.70,
+  "Insulation": 2.35,
+  "Drywall Materials": 2.80,
+  "Drywall Labor": 4.60,
+  "Interior Finish": 4.15,
+  "Exterior Works": 4.30
+};
+
+const V14_CONTRACTOR_BY_PHASE = {
+  "Foundation": "Foundation Crew",
+  "Footers Labor": "Foundation Crew",
+  "Foundation Labor": "Foundation Crew",
+  "Concrete Slab Labor": "Foundation Crew",
+  "Framing": "Framing Subcontractor",
+  "Framing Labor": "Framing Subcontractor",
+  "Framing-Trusses": "Framing Subcontractor",
+  "Exterior Works": "Exterior Subcontractor",
+  "Roofing": "Roofing Subcontractor",
+  "MEP Rough-in": "Electrical / Plumbing Crew",
+  "Electrical Labor": "Electrical Subcontractor",
+  "Plumbing Labor": "Plumbing Subcontractor",
+  "HVAC System": "HVAC Subcontractor",
+  "Interior Works": "Interior Crew",
+  "Drywall Labor": "Drywall Subcontractor",
+  "Site Operations": "Site Crew",
+  "Survey Services": "Survey Contractor",
+  "Plans": "Design / Plans Contractor",
+  "Permits": "Permit Coordination",
+  "Site Work": "Site Crew",
+  "Water & Sewer Line": "Utility Contractor",
+  "Concrete Pump": "Concrete Pump Contractor",
+  "Foundation Materials": "Foundation Supply",
+  "Concrete Slab Materials": "Concrete Supply",
+  "Wall Framing 1F Materials": "Framing Supply",
+  "Floor System 2F Materials": "Framing Supply",
+  "Wall Framing 2F Materials": "Framing Supply",
+  "Floor System 3F Materials": "Framing Supply",
+  "Wall Framing 3F Materials": "Framing Supply",
+  "Roof System Framing Materials": "Framing Supply",
+  "Fire Wall Framing Materials": "Framing Supply",
+  "Framing Hardware": "Framing Supply",
+  "Windows": "Windows Vendor",
+  "Exterior Doors": "Exterior Doors Vendor",
+  "Insulation": "Insulation Subcontractor",
+  "Drywall Materials": "Drywall Supplier",
+  "Interior Finish": "Interior Crew"
+};
+
+// Real distance matrix (miles) and cost-per-mile, same reference data already
+// validated in Queue Theory / MCTS (Distance Matrix — All 28 Site Pairs).
+const V14_COST_PER_MILE = 7;
+const V14_DISTANCES = {
+  "W1-W2":8,  "W1-W3":10, "W1-W4":12, "W1-W5":15, "W1-W6":18, "W1-W7":22, "W1-W8":25,
+  "W2-W3":10, "W2-W4":15, "W2-W5":14, "W2-W6":17, "W2-W7":21, "W2-W8":28,
+  "W3-W4":8,  "W3-W5":12, "W3-W6":16, "W3-W7":20, "W3-W8":34,
+  "W4-W5":10, "W4-W6":14, "W4-W7":19, "W4-W8":42,
+  "W5-W6":11, "W5-W7":16, "W5-W8":52,
+  "W6-W7":13, "W6-W8":28,
+  "W7-W8":18
+};
+
+function v14GetDistance(a, b){
+  const k1 = a + "-" + b, k2 = b + "-" + a;
+  return V14_DISTANCES[k1] !== undefined ? V14_DISTANCES[k1] : (V14_DISTANCES[k2] || 0);
+}
+
+const V14_PHASES = [
+  "Survey Services",
+  "Plans",
+  "Permits",
+  "Site Work",
+  "Water & Sewer Line",
+  "Footers Labor",
+  "Foundation Labor",
+  "Concrete Slab Labor",
+  "Framing Labor",
+  "Framing-Trusses",
+  "Roofing",
+  "Windows",
+  "Exterior Doors",
+  "Plumbing Labor",
+  "Electrical Labor",
+  "HVAC System",
+  "Insulation",
+  "Drywall Materials",
+  "Drywall Labor",
+  "Interior Finish",
+  "Exterior Works",
+  "MEP Rough-in",
+  "Foundation",
+  "Framing"
+];
+
+const V14_BASE_PROJECTS = [
+  {id:"W1", name:"Foundation", phase:"Foundation", baseDuration:8, availableDay:1, sqft:2400, oraRiskDays:1},
+  {id:"W2", name:"Framing", phase:"Framing", baseDuration:10, availableDay:2, sqft:2600, oraRiskDays:2},
+  {id:"W3", name:"Site Operations", phase:"Site Operations", baseDuration:7, availableDay:3, sqft:2100, oraRiskDays:1},
+  {id:"W4", name:"MEP Rough-in", phase:"MEP Rough-in", baseDuration:9, availableDay:2, sqft:2550, oraRiskDays:2},
+  {id:"W5", name:"Roofing", phase:"Roofing", baseDuration:6, availableDay:4, sqft:2300, oraRiskDays:1},
+  {id:"W6", name:"Interior Works", phase:"Interior Works", baseDuration:11, availableDay:5, sqft:2500, oraRiskDays:2},
+  {id:"W7", name:"Exterior Works", phase:"Exterior Works", baseDuration:9, availableDay:1, sqft:2700, oraRiskDays:2},
+  {id:"W8", name:"Foundation", phase:"Foundation", baseDuration:7, availableDay:3, sqft:2250, oraRiskDays:1}
+];
+
+function v14Rand(seedValue){
+  let x = 2166136261;
+  String(seedValue).split("").forEach(ch => {
+    x ^= ch.charCodeAt(0);
+    x = Math.imul(x, 16777619);
+  });
+  return function(){
+    x += 0x6D2B79F5;
+    let t = x;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function v14Shuffle(arr, rand){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rand()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function v14ContractorForPhase(phase){
+  return V14_CONTRACTOR_BY_PHASE[phase] || (phase + " Contractor");
+}
+
+function v14TradeCostForPhase(phase){
+  if(V14_TRADE_COSTS[phase] !== undefined) return V14_TRADE_COSTS[phase];
+  if(phase === "Foundation") return V14_TRADE_COSTS["Foundation Labor"];
+  if(phase === "Framing") return V14_TRADE_COSTS["Framing Labor"];
+  if(phase === "MEP Rough-in") return V14_TRADE_COSTS["Electrical Labor"];
+  if(phase === "Interior Works") return V14_TRADE_COSTS["Interior Finish"];
+  if(phase === "Exterior Works") return V14_TRADE_COSTS["Exterior Works"];
+  if(phase === "Site Operations") return V14_TRADE_COSTS["Site Work"];
+  return 3.0;
+}
+
+function v14DailyPhaseValue(project){
+  const costPerSqFt = v14TradeCostForPhase(project.phase);
+  return (project.sqft * costPerSqFt) / Math.max(1, project.baseDuration);
+}
+
+function v14DelayCostForWait(project, waitDays){
+  const dailyPhase = v14DailyPhaseValue(project);
+  const capped = Math.min(Math.max(0, Math.ceil(waitDays)), V14_DELAY_NORMALIZATION_DAYS);
+  let cost = 0;
+  for(let d=1; d<=capped; d++){
+    cost += V14_FIXED_OVERHEAD_PER_DAY + dailyPhase * Math.pow(d / V14_DELAY_NORMALIZATION_DAYS, 2);
+  }
+  return {
+    cost: Math.round(cost),
+    cappedWaitDays: capped,
+    replacementTriggered: waitDays > V14_DELAY_NORMALIZATION_DAYS,
+    dailyPhaseValue: Number(dailyPhase.toFixed(2))
+  };
+}
+
+function v14GenerateProjectCardMutation(seed){
+  /*
+    v18 reform:
+    The seed now creates a material scenario package, not a cosmetic one.
+
+    Rules:
+    - At least TWO Project Cards are affected.
+    - The primary Project Card always changes construction phase/trade.
+    - The seed also changes availability, duration, and/or ORA risk.
+    - A second Project Card is intentionally aligned to the same contractor group
+      when possible, so the Queue layer has a real opportunity to generate
+      contractor contention.
+    - Global matrices remain unchanged.
+  */
+  const rand = v14Rand(seed);
+  const projects = V14_BASE_PROJECTS.map(p => ({...p}));
+  const changes = [];
+
+  function pushChange(projectId, field, originalValue, newValue){
+    if(String(originalValue) === String(newValue)) return;
+    changes.push({
+      projectId,
+      field,
+      label: v14FieldLabel(field),
+      originalValue,
+      newValue
+    });
+  }
+
+  // Prefer early baseline projects because changes there produce meaningful
+  // sequence pressure instead of small end-of-route adjustments.
+  const earlyIds = ["W1","W2","W3","W4","W5"];
+  const primaryId = earlyIds[Math.floor(rand()*earlyIds.length)];
+  const primary = projects.find(p => p.id === primaryId);
+  const primaryBefore = {...primary};
+
+  // High-impact phase/trade universe: still drawn from the expanded trade list,
+  // but weighted toward trades that materially affect sequencing and shared
+  // contractor capacity.
+  const highImpactPhases = [
+    "Foundation Labor",
+    "Framing Labor",
+    "Framing-Trusses",
+    "Roofing",
+    "Electrical Labor",
+    "Plumbing Labor",
+    "HVAC System",
+    "Drywall Labor",
+    "Interior Finish",
+    "Exterior Works",
+    "Site Work"
+  ].filter(p => p !== primary.phase);
+
+  const newPrimaryPhase = highImpactPhases[Math.floor(rand()*highImpactPhases.length)];
+  pushChange(primary.id, "phase", primary.phase, newPrimaryPhase);
+  primary.phase = newPrimaryPhase;
+  primary.name = newPrimaryPhase;
+
+  // FIX B: removed the invented MODERATE/HIGH/SEVERE multiplier. It was not
+  // grounded in any W Rondon operational data, was never surfaced to the
+  // user or the AI prompt, and only inflated deltas artificially. The natural
+  // spread of each rand() range below already produces run-to-run variation
+  // without a synthetic amplification layer.
+  const availDelta = Math.round(5 + rand()*11);
+  const durDelta = Math.round(2 + rand()*7);
+  const riskDelta = Math.round(2 + rand()*7);
+
+  pushChange(primary.id, "availableDay", primary.availableDay, primary.availableDay + availDelta);
+  primary.availableDay += availDelta;
+
+  pushChange(primary.id, "baseDuration", primary.baseDuration, Math.max(3, primary.baseDuration + durDelta));
+  primary.baseDuration = Math.max(3, primary.baseDuration + durDelta);
+
+  if(rand() < 0.70){
+    const newRisk = primary.oraRiskDays + riskDelta;
+    pushChange(primary.id, "oraRiskDays", primary.oraRiskDays, newRisk);
+    primary.oraRiskDays = newRisk;
+  }
+  // Secondary card: create real contractor contention by assigning another
+  // project to the same phase/contractor family and overlapping its availability.
+  const secondaryCandidates = projects.filter(p => p.id !== primary.id);
+  const secondary = secondaryCandidates[Math.floor(rand()*secondaryCandidates.length)];
+  const secondaryBefore = {...secondary};
+
+  pushChange(secondary.id, "phase", secondary.phase, primary.phase);
+  secondary.phase = primary.phase;
+  secondary.name = primary.phase;
+
+  const overlapStart = Math.max(1, primary.availableDay - Math.ceil(1 + rand()*4));
+  pushChange(secondary.id, "availableDay", secondary.availableDay, overlapStart);
+  secondary.availableDay = overlapStart;
+
+  const secondaryDur = Math.max(3, secondary.baseDuration + Math.ceil(1 + rand()*5));
+  pushChange(secondary.id, "baseDuration", secondary.baseDuration, secondaryDur);
+  secondary.baseDuration = secondaryDur;
+
+  if(rand() < 0.55){
+    const secondaryRisk = secondary.oraRiskDays + Math.ceil(1 + rand()*4);
+    pushChange(secondary.id, "oraRiskDays", secondary.oraRiskDays, secondaryRisk);
+    secondary.oraRiskDays = secondaryRisk;
+  }
+
+  // Optional tertiary card: a smaller ripple, often enough to make the best
+  // sequence and the original sequence diverge more clearly.
+  if(rand() < 0.65){
+    const tertiaryCandidates = projects.filter(p => p.id !== primary.id && p.id !== secondary.id);
+    const tertiary = tertiaryCandidates[Math.floor(rand()*tertiaryCandidates.length)];
+    const delta = Math.ceil(3 + rand()*8);
+    pushChange(tertiary.id, "availableDay", tertiary.availableDay, tertiary.availableDay + delta);
+    tertiary.availableDay += delta;
+    if(rand() < 0.45){
+      const risk = tertiary.oraRiskDays + Math.ceil(1 + rand()*5);
+      pushChange(tertiary.id, "oraRiskDays", tertiary.oraRiskDays, risk);
+      tertiary.oraRiskDays = risk;
+    }
+  }
+
+  projects.forEach(p => {
+    p.contractor = v14ContractorForPhase(p.phase);
+    p.dailyPhaseValue = v14DailyPhaseValue(p);
+  });
+
+  const affectedContractor = v14ContractorForPhase(primary.phase);
+  const changeSummary = changes
+    .map(c => `${c.projectId} ${c.label}: ${c.originalValue} → ${c.newValue}`)
+    .join("; ");
+
+  const mutation = {
+    projectId: primary.id,
+    field: "scenarioPackage",
+    changeLabel: "multi-card contractor scenario package",
+    originalValue: primaryBefore.phase,
+    newValue: primary.phase,
+    originalCard: primaryBefore,
+    updatedCard: {...primary},
+    secondaryCard: {...secondary},
+    affectedContractor,
+    affectedProjectIds: Array.from(new Set(changes.map(c => c.projectId))),
+    changes,
+    changeSummary,
+    explanation: `Seed generated a multi-card contractor scenario package. Primary affected card: ${primary.id}. Secondary contractor-contention card: ${secondary.id}. Changes: ${changeSummary}. Global cost, reliability, pause-day, and logistics matrices remain unchanged.`
+  };
+
+  return {projects, mutation};
+}
+function v14LogisticsCost(sequence){
+  // Logistics Cost = distance between consecutive sites × real cost per mile.
+  // Uses the same validated Distance Matrix as Queue Theory / MCTS, so the
+  // Portfolio Simulator is consistent with the other finished exhibits.
+  let cost = 0;
+  for(let i=1;i<sequence.length;i++){
+    cost += v14GetDistance(sequence[i-1], sequence[i]) * V14_COST_PER_MILE;
+  }
+  return Math.round(cost);
+}
+
+function v14ContractorQueuePenalty(sequence, detail, projects){
+  /*
+    v16 reform:
+    Queue is evaluated over contractor demand windows derived from each
+    project's Project Card availability, duration, and risk buffer.
+
+    It no longer depends only on the fully serialized execution windows.
+    This allows Queue Theory to detect real contractor capacity conflicts
+    created by portfolio projects that are ready during overlapping calendar
+    windows, while sequence optimization still determines which order minimizes
+    total exposure.
+  */
+  const orderRank = {};
+  sequence.forEach((pid, idx) => { orderRank[pid] = idx; });
+
+  const groups = {};
+  projects.forEach(p => {
+    const demandStart = p.availableDay;
+    const demandEnd = p.availableDay + Math.max(1, p.baseDuration + Math.max(0, p.oraRiskDays || 0));
+    const d = detail[p.id] || {};
+    if(!groups[p.contractor]) groups[p.contractor] = [];
+    groups[p.contractor].push({
+      projectId:p.id,
+      contractor:p.contractor,
+      demandStart,
+      demandEnd,
+      scheduledStart:d.start ?? demandStart,
+      scheduledEnd:d.end ?? demandEnd,
+      orderRank:orderRank[p.id] ?? 999,
+      dailyPhaseValue:p.dailyPhaseValue,
+      delayBasis: Math.round(V14_FIXED_OVERHEAD_PER_DAY + p.dailyPhaseValue),
+      phase:p.phase
+    });
+  });
+
+  const bottlenecks = [];
+  let totalQueuePenalty = 0;
+
+  Object.entries(groups).forEach(([contractor, windows]) => {
+    windows.sort((a,b)=>a.demandStart-b.demandStart || a.orderRank-b.orderRank);
+
+    let maxConcurrent = 1;
+    windows.forEach(a => {
+      let concurrent = 0;
+      windows.forEach(b => {
+        if(a.demandStart < b.demandEnd && b.demandStart < a.demandEnd) concurrent += 1;
+      });
+      maxConcurrent = Math.max(maxConcurrent, concurrent);
+    });
+
+    let waitDays = 0;
+    let exposure = 0;
+    const projectsQueued = [];
+
+    if(maxConcurrent > 1){
+      // Single-capacity contractor service simulation. Priority follows the
+      // candidate sequence rank when multiple jobs are ready at the same time.
+      const pending = windows.slice();
+      let contractorAvailable = Math.min(...pending.map(w=>w.demandStart));
+      const served = [];
+
+      while(pending.length){
+        const ready = pending.filter(w => w.demandStart <= contractorAvailable)
+          .sort((a,b)=>a.orderRank-b.orderRank || a.demandStart-b.demandStart);
+
+        let job;
+        if(ready.length){
+          job = ready[0];
+        }else{
+          pending.sort((a,b)=>a.demandStart-b.demandStart || a.orderRank-b.orderRank);
+          job = pending[0];
+          contractorAvailable = Math.max(contractorAvailable, job.demandStart);
+        }
+
+        const idx = pending.indexOf(job);
+        pending.splice(idx,1);
+
+        const localWait = Math.max(0, contractorAvailable - job.demandStart);
+        if(localWait > 0){
+          waitDays += localWait;
+          const localExposure = Math.round(localWait * job.delayBasis);
+          exposure += localExposure;
+          projectsQueued.push(job.projectId);
+        }
+
+        const serviceDuration = Math.max(1, job.demandEnd - job.demandStart);
+        served.push({...job, serviceStart:contractorAvailable, serviceEnd:contractorAvailable + serviceDuration, localWait});
+        contractorAvailable += serviceDuration;
+      }
+    }
+
+    totalQueuePenalty += exposure;
+
+    const spanStart = Math.min(...windows.map(w=>w.demandStart));
+    const spanEnd = Math.max(...windows.map(w=>w.demandEnd));
+    const totalSpan = Math.max(1, spanEnd - spanStart);
+    const totalDemandDays = windows.reduce((s,w)=>s + Math.max(1, w.demandEnd - w.demandStart), 0);
+    // FIX A: utilization is a 0-100% measure of a single-capacity contractor's
+    // booked time within the span. Demand density above 100% (overlapping
+    // windows) is exactly what produces queue wait/exposure above, so the
+    // utilization indicator itself is capped at the physical maximum (100%).
+    const utilizationPct = Math.round(Math.min(100, (totalDemandDays / totalSpan) * 100));
+
+    bottlenecks.push({
+      contractor,
+      utilizationPct,
+      maxConcurrent,
+      expectedWaitDays:Number(waitDays.toFixed(1)),
+      structuralWaitExposure: exposure,
+      projects: windows.map(w=>w.projectId),
+      queuedProjects: Array.from(new Set(projectsQueued))
+    });
+  });
+
+  bottlenecks.sort((a,b)=>b.structuralWaitExposure-a.structuralWaitExposure || b.utilizationPct-a.utilizationPct);
+  return {
+    totalQueuePenalty,
+    primary: bottlenecks[0] || null,
+    secondary: bottlenecks[1] || null,
+    bottlenecks
+  };
+}
+function v14EvaluateSequence(sequence, projects){
+  let currentDay = 0;
+  const detail = {};
+  let delayCost = 0;
+
+  sequence.forEach(pid => {
+    const p = projects.find(x=>x.id===pid);
+    const readyDay = p.availableDay;
+    const start = Math.max(currentDay, readyDay);
+    const waitDays = Math.max(0, start - readyDay);
+    const delay = v14DelayCostForWait(p, waitDays);
+    const duration = p.baseDuration + Math.max(0, p.oraRiskDays || 0);
+    const end = start + duration;
+    delayCost += delay.cost;
+    detail[p.id] = {
+      start,
+      end,
+      waitDays,
+      duration,
+      delayCost: delay.cost,
+      dailyPhaseValue: delay.dailyPhaseValue,
+      replacementTriggered: delay.replacementTriggered,
+      contractor: p.contractor,
+      phase: p.phase
+    };
+    if(!delay.replacementTriggered){
+      currentDay = end;
+    }else{
+      currentDay = start + V14_DELAY_NORMALIZATION_DAYS;
+    }
+  });
+
+  const logisticsCost = v14LogisticsCost(sequence);
+  const queue = v14ContractorQueuePenalty(sequence, detail, projects);
+  const totalInefficiencyCost = Math.round(delayCost + logisticsCost + queue.totalQueuePenalty);
+
+  return {
+    sequence,
+    detail,
+    delayCost: Math.round(delayCost),
+    logisticsCost,
+    contractorQueueCost: queue.totalQueuePenalty,
+    totalInefficiencyCost,
+    queue
+  };
+}
+
+function v14RunMcts(projects, seed){
+  const rand = v14Rand(seed);
+  const ids = projects.map(p=>p.id);
+  const evaluated = [];
+  let best = null;
+  let worst = null;
+  const seen = new Set();
+
+  for(let i=0;i<V14_ITERATIONS;i++){
+    let seq;
+    if(i === 0){
+      seq = ids.slice();
+    }else if(i === 1){
+      seq = ids.slice().sort((a,b)=>{
+        const pa=projects.find(p=>p.id===a), pb=projects.find(p=>p.id===b);
+        return pa.availableDay - pb.availableDay || pb.dailyPhaseValue - pa.dailyPhaseValue;
+      });
+    }else{
+      seq = v14Shuffle(ids, rand);
+    }
+
+    const key = seq.join(">");
+    if(seen.has(key) && seen.size < 40320) continue;
+    seen.add(key);
+
+    const result = v14EvaluateSequence(seq, projects);
+    evaluated.push(result);
+
+    if(!best || result.totalInefficiencyCost < best.totalInefficiencyCost) best = result;
+    if(!worst || result.totalInefficiencyCost > worst.totalInefficiencyCost) worst = result;
+  }
+
+  evaluated.sort((a,b)=>a.totalInefficiencyCost-b.totalInefficiencyCost);
+  const alternative = evaluated[1] || evaluated[0];
+  const baseline = v14EvaluateSequence(ids, V14_BASE_PROJECTS.map(p => {
+    const x = {...p};
+    x.contractor = v14ContractorForPhase(x.phase);
+    x.dailyPhaseValue = v14DailyPhaseValue(x);
+    return x;
+  }));
+
+  return {
+    iterations: V14_ITERATIONS,
+    evaluatedSequences: seen.size,
+    optimalSequence: best.sequence,
+    alternativeSequence: alternative.sequence,
+    worstSequence: worst.sequence,
+    delayCost: best.delayCost,
+    logisticsCost: best.logisticsCost,
+    contractorQueueCost: best.contractorQueueCost,
+    totalInefficiencyCost: best.totalInefficiencyCost,
+    baselineTotalCost: baseline.totalInefficiencyCost,
+    modeledAvoidedExposure: Math.max(0, worst.totalInefficiencyCost - best.totalInefficiencyCost),
+    deltaVsBaseline: best.totalInefficiencyCost - baseline.totalInefficiencyCost,
+    detail: best.detail,
+    queue: best.queue,
+    topSequences: evaluated.slice(0,10).map(r => ({
+      sequence:r.sequence,
+      totalInefficiencyCost:r.totalInefficiencyCost,
+      delayCost:r.delayCost,
+      logisticsCost:r.logisticsCost,
+      contractorQueueCost:r.contractorQueueCost
+    }))
+  };
+}
+
+const V14_FIELD_LABELS = {
+  phase: "trade/construction phase",
+  baseDuration: "base duration (days)",
+  availableDay: "availability day",
+  sqft: "square footage",
+  oraRiskDays: "ORA risk buffer (days)"
+};
+function v14FieldLabel(field){
+  return V14_FIELD_LABELS[field] || field;
+}
+
+function v14BuildProfile(mcts, mutation){
+  const shifts = {};
+  mcts.optimalSequence.forEach((pid, idx) => {
+    const baseIdx = V14_BASE_PROJECTS.findIndex(p=>p.id===pid);
+    shifts[pid] = Math.max(0, Math.abs(idx-baseIdx));
+  });
+  const primary = mcts.queue.primary;
+  const affected = Array.from(new Set([mutation.projectId].concat(primary ? primary.projects : []).concat(mcts.optimalSequence.slice(0,2)))).slice(0,4);
+
+  // CASE A/B split: only contractors with measurable structural wait exposure
+  // are shown. No zero-value rows are used to "fill" the list — if nothing
+  // has real exposure, the panel shows a positive no-conflict state instead.
+  const realBottlenecks = (mcts.queue.bottlenecks || [])
+    .filter(b => Number(b.structuralWaitExposure || 0) > 0)
+    .sort((a,b) => b.structuralWaitExposure - a.structuralWaitExposure)
+    .slice(0,4);
+
+  const queues = realBottlenecks.map(b => [
+    `${(b.queuedProjects && b.queuedProjects[0]) || (b.projects && b.projects[0]) || mutation.projectId} · ${b.contractor}`,
+    b.contractor,
+    Number(b.expectedWaitDays || 0),
+    `$${Number(b.structuralWaitExposure || 0).toLocaleString("en-US")}`
+  ]);
+
+  return {
+    direct: mutation.projectId,
+    affected,
+    shifts,
+    queues,
+    hasQueueConflict: queues.length > 0,
+    directContractor: mutation.affectedContractor
+  };
+}
+
+function v14ApplyToScenario(s, seed, projects, mutation, mcts){
+  const primary = mcts.queue.primary || {};
+  const secondary = mcts.queue.secondary || {};
+
+  // POINT 4 FIX (Option A, approved): "Without ORA" is the cost of applying
+  // the ORIGINAL W1→W8 sequence to the SAME mutated Project Card data, not a
+  // comparison against an un-mutated baseline. "With ORA" is the optimal
+  // sequence cost on those same mutated data. Both figures now always
+  // reflect the specific disruption, instead of collapsing to a fixed number.
+  const originalIds = V14_BASE_PROJECTS.map(p => p.id);
+  const originalSequenceResult = v14EvaluateSequence(originalIds, projects);
+  const withoutOra = originalSequenceResult.totalInefficiencyCost;
+  const withOra = mcts.totalInefficiencyCost;
+  const avoidable = Math.max(0, withoutOra - withOra);
+
+  const affectedCount = new Set((mutation.affectedProjectIds || [mutation.projectId]).concat(primary.projects || [])).size || 1;
+  const fieldLabel = mutation.changeLabel || v14FieldLabel(mutation.field);
+
+  s.title = `${fieldLabel} affecting ${mutation.projectId}`;
+  s.summary = s.title;
+  s.project = `${mutation.projectId} · ${mutation.updatedCard.name}`;
+  s.resource = mutation.affectedContractor;
+  s.window = `Available Day ${mutation.updatedCard.availableDay}`;
+  s.type = `Project Card seed mutation · ${fieldLabel}`;
+  s.cost = `+$${withoutOra.toLocaleString("en-US")}`;
+  s.projects = String(affectedCount);
+  s.avoidable = `$${avoidable.toLocaleString("en-US")}`;
+
+  // POINT 13 FIX: sequence status is now computed per scenario instead of a
+  // static "CHANGED" label that never varied.
+  const sequenceChanged = JSON.stringify(mcts.optimalSequence) !== JSON.stringify(originalIds);
+  s.sequenceStatus = sequenceChanged ? "CHANGED" : "UNCHANGED";
+  s.sequenceStatusNote = sequenceChanged ? "Sequence engine recalculated route." : "Original sequence remains optimal.";
+
+  s.seedAudit = mutation;
+  s.projectCardsAfterSeed = projects;
+  s.mctsOutput = mcts;
+  s.withoutOraSequenceResult = originalSequenceResult;
+  s.queueOutput = {
+    primaryBottleneck: primary.contractor || "None",
+    secondaryBottleneck: secondary.contractor || "None",
+    utilizationPct: primary.utilizationPct || 0,
+    expectedWaitDays: primary.expectedWaitDays || 0,
+    structuralWaitExposure: primary.structuralWaitExposure || 0,
+    capacityAction: primary.structuralWaitExposure > 0 ? `Review backup capacity for ${primary.contractor}` : "No backup capacity required",
+    residualConstraint: secondary.contractor || "No secondary contractor constraint",
+    queueProjects: primary.projects || [],
+    allBottlenecks: mcts.queue.bottlenecks || []
+  };
+  s.dynamicProfile = v14BuildProfile(mcts, mutation);
+
+  s.narrative = [
+    `<strong>The generated seed changed a multi-card Project Card package, leaving all global matrices at default.</strong> ${mutation.explanation}`,
+    `<div class='response-section'>Sequence optimization output</div>The model evaluated ${mcts.iterations.toLocaleString("en-US")} candidate sequences and selected ${mcts.optimalSequence.join(" → ")} as the lowest-cost sequence. Total inefficiency cost is $${mcts.totalInefficiencyCost.toLocaleString("en-US")}, including polynomial Delay Cost, logistics cost, and contractor queue cost.`,
+    `<div class='response-section'>Contractor Queue output</div>The primary contractor bottleneck is ${s.queueOutput.primaryBottleneck}, with ${s.queueOutput.expectedWaitDays} expected wait days and $${Number(s.queueOutput.structuralWaitExposure).toLocaleString("en-US")} structural wait exposure.`,
+    `<div class='response-section'>Seed audit</div>${mutation.projectId} mutation package: ${mutation.changeSummary || `${fieldLabel} changed from ${mutation.originalValue} to ${mutation.newValue}`}.`
+  ];
+  s.ceo = `Use the recalculated optimal sequence ${mcts.optimalSequence.join(" → ")} as the execution baseline. Review ${s.queueOutput.primaryBottleneck} only if the contractor queue exposure remains material after field verification.`;
+  s.ora = `Verify the seed audit before execution: ${mutation.projectId} mutation package: ${mutation.changeSummary || `${fieldLabel} changed from ${mutation.originalValue} to ${mutation.newValue}`}. Confirm that global cost, reliability, pause-day, and logistics matrices remained unchanged.`;
+}
+
+function buildExecutiveScenarioSummary(s){
+  const profile = chartProfileForScenario(s);
+  const without = parseMoney(s.cost);
+  const avoidable = parseMoney(s.avoidable);
+  const withOra = Math.max(0, without - avoidable);
+  const improvement = without > 0 ? Math.round((avoidable / without) * 100) : 0;
+  const queueRows = profile.queues.map(row => `- ${row[0]} | Contractor: ${row[1]} | Expected wait: ${row[2].toFixed(1)} days | Exposure: ${row[3]}`).join("\n");
+  const affectedProjects = profile.affected.join(", ");
+  const shiftRows = Object.entries(profile.shifts || {})
+    .map(([project, days]) => `- ${project}: +${days} position/day indicator versus baseline`)
+    .join("\n");
+
+  const audit = s.seedAudit || {};
+  const m = s.mctsOutput || {};
+  const q = s.queueOutput || {};
+
+  return `===========================================================
+EXECUTIVE SCENARIO SUMMARY — SUPERSCRIPT v26
+===========================================================
+
+CASE
+AI Construction Portfolio Scenario Simulator
+
+Employer
+W Rondon Construction LLC
+
+Scenario ID
+${s.id}
+
+Irreversible Seed
+${s.seed}
+
+===========================================================
+SEED AUDIT — PROJECT CARD ONLY
+===========================================================
+
+Seed Rule
+The seed modifies a multi-card Project Card package only. Project square footage remains fixed. Global matrices remain at default.
+
+Project Card affected
+${audit.projectId || "N/A"}
+
+Fields changed
+${audit.changes && audit.changes.length ? audit.changes.map(c => `- ${c.projectId || ""} ${c.label}: ${c.originalValue} → ${c.newValue}`).join("\n") : (audit.field ? `- ${v14FieldLabel(audit.field)}: ${audit.originalValue ?? "N/A"} → ${audit.newValue ?? "N/A"}` : "N/A")}
+
+Affected contractor
+${audit.affectedContractor || s.resource}
+
+Explanation
+${audit.explanation || "N/A"}
+
+===========================================================
+STOCHASTIC SEQUENCE OPTIMIZATION OUTPUT
+===========================================================
+
+Optimization iterations
+${m.iterations ?? "N/A"}
+
+Evaluated sequences
+${m.evaluatedSequences ?? "N/A"}
+
+Optimal sequence
+${m.optimalSequence ? m.optimalSequence.join(" → ") : "N/A"}
+
+Alternative sequence
+${m.alternativeSequence ? m.alternativeSequence.join(" → ") : "N/A"}
+
+Worst sequence encountered
+${m.worstSequence ? m.worstSequence.join(" → ") : "N/A"}
+
+Polynomial Delay Cost
+$${Number(m.delayCost || 0).toLocaleString("en-US")}
+
+Logistics Cost
+$${Number(m.logisticsCost || 0).toLocaleString("en-US")}
+
+Contractor Queue Cost
+$${Number(m.contractorQueueCost || 0).toLocaleString("en-US")}
+
+Total Inefficiency Cost
+$${Number(m.totalInefficiencyCost || 0).toLocaleString("en-US")}
+
+Baseline Total Cost (unmutated Project Cards, for reference only)
+$${Number(m.baselineTotalCost || 0).toLocaleString("en-US")}
+
+Modeled avoided exposure versus worst sequence encountered
+$${Number(m.modeledAvoidedExposure || 0).toLocaleString("en-US")}
+
+Sequence Cost Formula Boundary
+Delay Cost is not invented by AI or the contingency. It is computed by the stochastic sequence optimization engine as fixed daily overhead plus nonlinear phase-value penalty:
+fixed overhead + daily phase value × (wait day / 10)^2, capped at 10 wait days.
+
+===========================================================
+CONTRACTOR QUEUE OUTPUT
+===========================================================
+
+Queue Rule
+Queue is contractor-based and date-aware. It does not generate a separate scenario.
+
+Primary contractor bottleneck
+${q.primaryBottleneck || "N/A"}
+
+Secondary contractor bottleneck
+${q.secondaryBottleneck || "N/A"}
+
+Utilization indicator
+${q.utilizationPct ?? "N/A"}%
+
+Expected wait
+${q.expectedWaitDays ?? "N/A"} days
+
+Structural wait exposure
+$${Number(q.structuralWaitExposure || 0).toLocaleString("en-US")}
+
+Capacity action boundary
+${q.capacityAction || "N/A"}
+
+Residual constraint
+${q.residualConstraint || "N/A"}
+
+Queue exposure
+${queueRows || "- No structural queue conflict detected for this scenario."}
+
+===========================================================
+PORTFOLIO IMPACT
+===========================================================
+
+Without ORA
+Portfolio-wide scenario exposure: $${without.toLocaleString("en-US")}
+
+With ORA
+Residual modeled exposure after calculated recovery: $${withOra.toLocaleString("en-US")}
+
+Modeled Avoidable Exposure
+$${avoidable.toLocaleString("en-US")}
+
+Modeled Improvement
+${improvement}%
+
+Project shifts / affected sequence
+${shiftRows || "- No material sequence shift detected."}
+
+Affected projects
+${affectedProjects}
+
+===========================================================
+TASK
+===========================================================
+
+Interpret only the deterministic findings above.
+Explain how Project Card mutation, stochastic sequence optimization, and contractor Queue exposure interact.
+Do not invent mitigation actions.
+Do not treat modeled avoided exposure as realized savings.
+Do not say equipment unless the data explicitly says equipment.
+Produce ONLY:
+
+Executive Interpretation
+
+CEO Strategic Decision
+
+ORA Analytical Assessment.`;
+}
+async function callOraWorker(summary){
+  // HARD SAFETY RULE:
+  // The Cloudflare Worker may be called ONLY from GENERATE CONTINGENCY.
+  // RUN, RESET, row selection, CLEAR, CLEAR ALL, loadScenario, and renderRecords
+  // are not allowed to trigger API usage under any circumstance.
+  if(oraCallSource !== "GENERATE_CONTINGENCY"){
+    throw new Error("Blocked Worker call: source is not GENERATE_CONTINGENCY.");
+  }
+
+  console.info("ORA Worker call allowed from GENERATE_CONTINGENCY only.");
+
+  const response = await fetch(ORA_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      temperature: 0.05,
+      max_tokens: 1500,
+      messages: [
+        { role: "user", content: summary }
+      ]
+    })
+  });
+
+  const data = await response.json();
+  if(!response.ok){
+    throw new Error(data?.error || `Worker returned HTTP ${response.status}`);
+  }
+
+  const content = data?.choices?.[0]?.message?.content;
+  if(!content){
+    throw new Error("Worker response did not contain choices[0].message.content.");
+  }
+  return { content, data };
+}
+
+async function generateOraAssessment(s){
+  if(isOraRunning) return;
+  isOraRunning = true;
+  oraCallSource = "GENERATE_CONTINGENCY";
+  setAIResponding();
+  renderRecords();
+  try{
+    const summary = buildExecutiveScenarioSummary(s);
+    const { content, data } = await callOraWorker(summary);
+    const sections = await applyOraResponse(content, {summary, workerData:data, scenario:s});
+
+    // Persist the complete AI output inside the saved scenario record.
+    // From this point forward, RUN republishes this saved output without calling the Worker.
+    s.aiSections = {
+      executive: sections.executive,
+      ceo: sections.ceo,
+      ora: sections.ora
+    };
+    s.aiExchange = lastOraExchange;
+    s.status = "AI Ready";
+
+    setAIReady();
+  }catch(error){
+    console.error("ORA Worker integration error:", error);
+    setAIError(error.message);
+    s.aiError = error.message;
+  }finally{
+    oraCallSource = null;
+    isOraRunning = false;
+    renderRecords();
+  }
+}
+
+function beginAIResponse(){
+  stopAIProcessingMessages();
+  el("aiState").textContent="SCENARIO READY";
+  el("streamingText").textContent="Saved contingency loaded from records. No Worker call was made.";
+  el("dots").classList.add("hidden");
+  const jsonBtn = el("aiJsonBtn");
+  if(jsonBtn && lastOraExchange) jsonBtn.classList.remove("hidden");
+}
+
+function runScenario(s){
+  oraCallSource = null;
+  if(selectedId !== s.id || isOraRunning) return;
+
+  // RUN does not call the Worker.
+  // It reloads the saved contingency exactly as stored, including the saved AI response and downloadable JSON.
+  scenarios.forEach(item=>item.status=item.id===s.id?"Last Run":(item.aiSections?"AI Ready":"Not Run"));
+  loadScenario(s);
+  renderRecords();
+  beginAIResponse();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function clearScenario(id){
+  if(selectedId !== id) return;
+  scenarios=scenarios.filter(s=>s.id!==id);
+  selectedId=null;
+  renderRecords();
+}
+
+el("generateBtn").addEventListener("click",()=>{
+  const now = Date.now();
+  if(isOraRunning || (now - lastGenerateClickAt) < 2500) return;
+  lastGenerateClickAt = now;
+
+  // GENERATE CONTINGENCY is the only frontend action that calls the Worker.
+  // v21: seed mutates a material multi-card Project Card package without changing project square footage; runs stochastic sequence optimization formulas, date-aware contractor Queue, stores AI consistency checks in JSON, and exports only the published AI panel text through a direct anchor download.
+  const template = structuredClone(generatedScenarios[generatedIndex % generatedScenarios.length]);
+  const randomSeed = String(Date.now()) + "-" + String(Math.floor(10000 + Math.random() * 90000));
+
+  const seedResult = v14GenerateProjectCardMutation(randomSeed);
+  const mcts = v14RunMcts(seedResult.projects, randomSeed);
+
+  // FIX (approved): the scenario id used to be `S-2026-${20 + generatedIndex}`,
+  // a session-scoped counter that resets to 0 on every page load. That meant
+  // the FIRST live-generated scenario of every session was always named
+  // "S-2026-020" regardless of which real seed produced it — a real
+  // traceability problem across audit logs from different sessions/days.
+  // The id is now derived from the seed itself (already guaranteed unique:
+  // millisecond timestamp + 5-digit random suffix), so two different real
+  // generations never collide. Kept at 6 digits (vs. the fixed baseline/
+  // template ids' 3 digits) so it's visually obvious which ids are
+  // seed-derived live generations vs. fixed baseline records.
+  const seedDigitsOnly = randomSeed.replace(/[^0-9]/g, "");
+  const idSuffix = seedDigitsOnly.slice(-6).padStart(6, "0");
+
+  const candidate = {
+    ...template,
+    id: `S-2026-${idSuffix}`,
+    seed: String(randomSeed),
+    status: "Generating AI"
+  };
+
+  v14ApplyToScenario(candidate, randomSeed, seedResult.projects, seedResult.mutation, mcts);
+  generatedIndex += 1;
+
+  scenarios.push(candidate);
+  selectedId=null;
+  loadScenario(candidate);
+  renderRecords();
+  window.scrollTo({top:0,behavior:"smooth"});
+  generateOraAssessment(candidate);
+});
+
+el("resetBtn").addEventListener("click",()=>{
+  stopAIProcessingMessages();
+  selectedId=null;
+  lastOraExchange = null;
+  loadScenario(baselineScenarios[0]);renderRecords();
+  const jsonBtn = el("aiJsonBtn");
+  if(jsonBtn) jsonBtn.classList.add("hidden");
+  el("aiState").textContent="BASELINE RESTORED";el("streamingText").textContent="Baseline scenario restored. No Worker call was made.";el("dots").classList.add("hidden");
+  setTimeout(()=>el("aiState").textContent="RESPONSE READY",900);
+});
+
+el("clearAllBtn").addEventListener("click",()=>{scenarios=[];selectedId=null;renderRecords();});
+
+if(el("aiJsonBtn")){
+  el("aiJsonBtn").addEventListener("click", (evt) => {
+    const link = el("aiJsonBtn");
+    if(!lastOraExchange){
+      evt.preventDefault();
+      el("streamingText").textContent = "No AI Audit Log is available yet.";
+      return;
+    }
+    prepareOraJsonDownloadLink();
+    el("streamingText").textContent = `AI Audit Log download requested: ${link.dataset.filename || "AI_Audit_Log.json"}`;
+    // Do not preventDefault: the browser handles the real <a download> link.
+    // If Safari blocks it, use Option-click/Open in new tab or the modal fallback below.
+    setTimeout(() => {
+      const modal = el("jsonModal");
+      const area = el("jsonTextArea");
+      const title = el("jsonModalTitle");
+      if(modal && area && link.dataset.jsonText){
+        title.textContent = `AI Audit Log — ${link.dataset.filename || "AI_Audit_Log.json"}`;
+        area.value = link.dataset.jsonText;
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden","false");
+        el("streamingText").textContent = "If no file downloaded, use COPY or SELECT ALL in the panel.";
+      }
+    }, 1400);
+  });
+}
+
+if(el("jsonCloseBtn")){
+  el("jsonCloseBtn").addEventListener("click", () => {
+    const modal = el("jsonModal");
+    if(modal){
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden","true");
+    }
+  });
+}
+if(el("jsonSelectBtn")){
+  el("jsonSelectBtn").addEventListener("click", () => {
+    const area = el("jsonTextArea");
+    if(area){ area.focus(); area.select(); }
+  });
+}
+if(el("jsonCopyBtn")){
+  el("jsonCopyBtn").addEventListener("click", async () => {
+    const area = el("jsonTextArea");
+    if(!area) return;
+    area.focus();
+    area.select();
+    try{
+      await navigator.clipboard.writeText(area.value);
+      el("streamingText").textContent = "AI Audit Log copied to clipboard.";
+    }catch(error){
+      document.execCommand("copy");
+      el("streamingText").textContent = "AI Audit Log selected. Press Command+C if it was not copied automatically.";
+    }
+  });
+}
+
+// POINT 5 FIX: these print-related listeners are registered ONCE here, at
+// script load, instead of inside the resetBtn click handler (where they used
+// to accumulate a new duplicate pair on every RESET click).
+window.addEventListener("beforeprint", resetResponseScrolls);
+window.addEventListener("afterprint", resetResponseScrolls);
+
+// POINT 3: baseline records are built from the real engine (fixed seeds),
+// not hand-typed text. Computed once here, after all engine consts/functions
+// above have executed.
+const baselineScenarios = buildInitialScenarios();
+scenarios = baselineScenarios.slice();
+loadScenario(baselineScenarios[0]);renderRecords();
+</script>
+
+<div class="json-modal" id="jsonModal" aria-hidden="true" style="display:none!important">
+  <div class="json-box">
+    <div class="json-head">
+      <div class="json-title" id="jsonModalTitle">AI Audit Log</div>
+      <div class="json-actions">
+        <button type="button" class="json-action" id="jsonCopyBtn">COPY</button>
+        <button type="button" class="json-action" id="jsonSelectBtn">SELECT ALL</button>
+        <button type="button" class="json-action json-close" id="jsonCloseBtn">CLOSE</button>
+      </div>
+    </div>
+    <textarea class="json-text" id="jsonTextArea" spellcheck="false"></textarea>
+  </div>
+</div>
+
+</body>
+</html>
